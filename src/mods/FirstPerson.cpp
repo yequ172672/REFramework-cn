@@ -5,6 +5,7 @@
 
 #include "utility/Scan.hpp"
 #include "REFramework.hpp"
+#include "../utility/Localization.hpp"
 #include "sdk/REMath.hpp"
 #include "sdk/MurmurHash.hpp"
 #include "sdk/Application.hpp"
@@ -101,7 +102,7 @@ void FirstPerson::on_draw_ui() {
         ImGui::DragFloat4("##", (float*)&elem, 1.0f, -1.0f, 1.0f);
     }*/
 
-    if (m_enabled->draw("Enabled")) {
+    if (m_enabled->draw(REF_TR("Enabled"))) {
         // Disable fov and camera light changes
         m_wants_disable = !m_enabled->value();
     }
@@ -109,19 +110,19 @@ void FirstPerson::on_draw_ui() {
     ImGui::SameLine();
 
     // Revert the updateCamera value to normal
-    if (m_show_in_cutscenes->draw("Show In Cutscenes") && m_camera_system != nullptr && CAMSYS(m_camera_system, mainCameraController) != nullptr) {
+    if (m_show_in_cutscenes->draw(REF_TR("Show In Cutscenes")) && m_camera_system != nullptr && CAMSYS(m_camera_system, mainCameraController) != nullptr) {
         CAMSYS(m_camera_system, mainCameraController)->updateCamera = true;
     }
 
     ImGui::Separator();
-    ImGui::Text("VR Specific Settings");
+    ImGui::Text(REF_TR("VR Specific Settings"));
 
-    m_smooth_xz_movement->draw("Smooth XZ Movement (VR)");
-    m_smooth_y_movement->draw("Smooth Y Movement (VR)");
-    m_roomscale->draw("Roomscale Movement (VR)");
+    m_smooth_xz_movement->draw(REF_TR("Smooth XZ Movement (VR)"));
+    m_smooth_y_movement->draw(REF_TR("Smooth Y Movement (VR)"));
+    m_roomscale->draw(REF_TR("Roomscale Movement (VR)"));
 
     static bool adjust_hand_offset{false};
-    ImGui::Checkbox("Adjust Hand Offset", &adjust_hand_offset);
+    ImGui::Checkbox(REF_TR("Adjust Hand Offset"), &adjust_hand_offset);
 
     if (adjust_hand_offset) {
         auto& vr = VR::get();
@@ -173,57 +174,57 @@ void FirstPerson::on_draw_ui() {
         }
     }
 
-    ImGui::DragFloat4("Scale Debug", (float*)&m_scale_debug.x, 1.0f, -1.0f, 1.0f);
-    ImGui::DragFloat4("Scale Debug 2", (float*)&m_scale_debug2.x, 1.0f, -1.0f, 1.0f);
-    ImGui::DragFloat4("Offset Debug", (float*)&m_offset_debug.x, 1.0f, -1.0f, 1.0f);
-    ImGui::DragFloat("VR Scale", (float*)&m_vr_scale, 0.01f, 0.01f, 1.0f);
+    ImGui::DragFloat4(REF_TR("Scale Debug"), (float*)&m_scale_debug.x, 1.0f, -1.0f, 1.0f);
+    ImGui::DragFloat4(REF_TR("Scale Debug 2"), (float*)&m_scale_debug2.x, 1.0f, -1.0f, 1.0f);
+    ImGui::DragFloat4(REF_TR("Offset Debug"), (float*)&m_offset_debug.x, 1.0f, -1.0f, 1.0f);
+    ImGui::DragFloat(REF_TR("VR Scale"), (float*)&m_vr_scale, 0.01f, 0.01f, 1.0f);
 
-    ImGui::DragFloat3("Controller rotation (Left)", (float*)&m_left_hand_rotation_offset, 0.1f, -360.0f, 360.0f);
-    ImGui::DragFloat3("Controller rotation (Right)", (float*)&m_right_hand_rotation_offset, 0.1f, -360.0f, 360.0f);
-    ImGui::DragFloat3("Controller position (Left)", (float*)&m_left_hand_position_offset, 0.01f, -2.0f, 2.0f);
-    ImGui::DragFloat3("Controller position (Right)", (float*)&m_right_hand_position_offset, 0.01f, -2.0f, 2.0f);
+    ImGui::DragFloat3(REF_TR("Controller rotation (Left)"), (float*)&m_left_hand_rotation_offset, 0.1f, -360.0f, 360.0f);
+    ImGui::DragFloat3(REF_TR("Controller rotation (Right)"), (float*)&m_right_hand_rotation_offset, 0.1f, -360.0f, 360.0f);
+    ImGui::DragFloat3(REF_TR("Controller position (Left)"), (float*)&m_left_hand_position_offset, 0.01f, -2.0f, 2.0f);
+    ImGui::DragFloat3(REF_TR("Controller position (Right)"), (float*)&m_right_hand_position_offset, 0.01f, -2.0f, 2.0f);
 
-    ImGui::DragFloat3("Controller 1", (float*)&m_last_controller_euler[0].x, 1.0f, -360.0f, 360.0f);
-    ImGui::DragFloat3("Controller 2", (float*)&m_last_controller_euler[1].x, 1.0f, -360.0f, 360.0f);
+    ImGui::DragFloat3(REF_TR("Controller 1"), (float*)&m_last_controller_euler[0].x, 1.0f, -360.0f, 360.0f);
+    ImGui::DragFloat3(REF_TR("Controller 2"), (float*)&m_last_controller_euler[1].x, 1.0f, -360.0f, 360.0f);
 
     ImGui::Separator();
-    ImGui::Text("General Settings");
+    ImGui::Text(REF_TR("General Settings"));
 
-    m_disable_light_source->draw("Disable Camera Light");
-    m_hide_mesh->draw("Hide Joint Mesh");
+    m_disable_light_source->draw(REF_TR("Disable Camera Light"));
+    m_hide_mesh->draw(REF_TR("Hide Joint Mesh"));
 
     ImGui::SameLine();
-    m_rotate_mesh->draw("Force Rotate Joint");
-    m_rotate_body->draw("Rotate Body");
+    m_rotate_mesh->draw(REF_TR("Force Rotate Joint"));
+    m_rotate_body->draw(REF_TR("Rotate Body"));
 
-    if (m_disable_vignette->draw("Disable Vignette") && m_disable_vignette->value() == false) {
+    if (m_disable_vignette->draw(REF_TR("Disable Vignette")) && m_disable_vignette->value() == false) {
         set_vignette(via::render::ToneMapping::Vignetting::KerarePlus);
     }
 
-    m_toggle_key->draw("Change Toggle Key");
+    m_toggle_key->draw(REF_TR("Change Toggle Key"));
 
-    ImGui::SliderFloat3("CameraOffset", (float*)&m_attach_offsets[m_player_name], -2.0f, 2.0f, "%.3f", 1.0f);
+    ImGui::SliderFloat3(REF_TR("CameraOffset"), (float*)&m_attach_offsets[m_player_name], -2.0f, 2.0f, "%.3f", 1.0f);
 
-    m_camera_scale->draw("CameraSpeed");
-    m_bone_scale->draw("CameraShake");
+    m_camera_scale->draw(REF_TR("CameraSpeed"));
+    m_bone_scale->draw(REF_TR("CameraShake"));
 
     if (m_camera_system != nullptr) {
-        if (m_fov_offset->draw("FOVOffset")) {
+        if (m_fov_offset->draw(REF_TR("FOVOffset"))) {
             update_fov(CAMSYS(m_camera_system, cameraController));
         }
 
-        if (m_fov_mult->draw("FOVMultiplier")) {
+        if (m_fov_mult->draw(REF_TR("FOVMultiplier"))) {
             update_fov(CAMSYS(m_camera_system, cameraController));
             m_last_fov_mult = m_fov_mult->value();
         }
 
         m_current_fov->value() = CAMSYS(m_camera_system, cameraController)->activeCamera->fov;
-        m_current_fov->draw("CurrentFOV");
+        m_current_fov->draw(REF_TR("CurrentFOV"));
     }
 
-    m_body_rotate_speed->draw("BodyRotateSpeed");
+    m_body_rotate_speed->draw(REF_TR("BodyRotateSpeed"));
 
-    if (ImGui::InputText("Joint", m_attach_bone_imgui.data(), 256)) {
+    if (ImGui::InputText(REF_TR("Joint"), m_attach_bone_imgui.data(), 256)) {
         m_attach_bone = std::wstring{ std::begin(m_attach_bone_imgui), std::end(m_attach_bone_imgui) };
     }
 
@@ -231,7 +232,7 @@ void FirstPerson::on_draw_ui() {
         return g_first_person->list_box_handler_attach(data, idx, out_text);
     };
 
-    if (ImGui::ListBox("Joints", &m_attach_selected, list_box_handler, &m_attach_names, (int32_t)m_attach_names.size())) {
+    if (ImGui::ListBox(REF_TR("Joints"), &m_attach_selected, list_box_handler, &m_attach_names, (int32_t)m_attach_names.size())) {
         m_attach_bone_imgui = m_attach_names[m_attach_selected];
         m_attach_bone = std::wstring{ std::begin(m_attach_names[m_attach_selected]), std::end(m_attach_names[m_attach_selected]) };
     }

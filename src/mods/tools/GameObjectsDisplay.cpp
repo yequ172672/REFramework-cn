@@ -14,6 +14,7 @@
 
 #include "../BackBufferRenderer.hpp"
 #include "GameObjectsDisplay.hpp"
+#include "../../utility/Localization.hpp"
 
 std::optional<std::string> GameObjectsDisplay::on_initialize_d3d_thread() {
     return initialize_d3d_resources();
@@ -131,7 +132,7 @@ void GameObjectsDisplay::on_draw_dev_ui() {
         return;
     }
 
-    if (m_enabled->draw("Enabled")) {
+    if (m_enabled->draw(REF_TR("Enabled"))) {
         if (m_enabled->value()) {
             m_needs_d3d_init = true;
         }
@@ -139,11 +140,11 @@ void GameObjectsDisplay::on_draw_dev_ui() {
 
     ImGui::SameLine();
 
-    ImGui::Checkbox("Legacy Mode", &m_legacy_mode);
+    ImGui::Checkbox(REF_TR("Legacy Mode"), &m_legacy_mode);
 
-    m_max_distance->draw("Max Distance for GameObjects");
+    m_max_distance->draw(REF_TR("Max Distance for GameObjects"));
 
-    if (ImGui::SliderFloat("Object Effect Alpha", &m_effect_alpha, 0.0f, 1.0f)) {
+    if (ImGui::SliderFloat(REF_TR("Object Effect Alpha"), &m_effect_alpha, 0.0f, 1.0f)) {
         m_effect_dirty = true;
     }
 }

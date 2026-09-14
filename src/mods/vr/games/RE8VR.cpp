@@ -9,6 +9,7 @@
 // AND THE GAME MAY CRASH. THIS IS REQUIRED FOR THE sol_lua_push DECLARATION.
 #include "../../../mods/ScriptRunner.hpp"
 #include "../../../mods/VR.hpp"
+#include "../../../utility/Localization.hpp"
 
 #include "RE8VR.hpp"
 
@@ -119,11 +120,11 @@ void RE8VR::on_draw_ui() {
         return;
     }
 
-    m_hide_upper_body->draw("Hide Upper Body");
-    m_hide_lower_body->draw("Hide Lower Body");
-    m_hide_arms->draw("Hide Arms");
-    m_hide_upper_body_cutscenes->draw("Auto Hide Upper Body in Cutscenes");
-    m_hide_lower_body_cutscenes->draw("Auto Hide Lower Body in Cutscenes");
+    m_hide_upper_body->draw(REF_TR("Hide Upper Body"));
+    m_hide_lower_body->draw(REF_TR("Hide Lower Body"));
+    m_hide_arms->draw(REF_TR("Hide Arms"));
+    m_hide_upper_body_cutscenes->draw(REF_TR("Auto Hide Upper Body in Cutscenes"));
+    m_hide_lower_body_cutscenes->draw(REF_TR("Auto Hide Lower Body in Cutscenes"));
 }
 
 void RE8VR::on_pre_application_entry(void* entry, const char* name, size_t hash) {

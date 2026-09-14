@@ -14,6 +14,7 @@
 #include "utility/Module.hpp"
 #include "utility/Scan.hpp"
 #include "utility/Emulation.hpp"
+#include "../utility/Localization.hpp"
 #include <bdshemu.h>
 
 // Windows.h arrives via the utility headers above; TlHelp32 requires it to come first.
@@ -2806,21 +2807,21 @@ void IntegrityCheckBypass::on_draw_ui() {
     if (sdk::GameIdentity::get().tdb_ver() < 81) {
         return;
     }
-    if (!ImGui::CollapsingHeader("PAK Directory Loading")) {
+    if (!ImGui::CollapsingHeader(REF_TR("PAK Directory Loading"))) {
         return;
     }
 
-    ImGui::Text("Allow loading PAKs inside %s directory. PAKs can be of any filename and ends with .pak (case-sensitive)", IntegrityCheckBypass::CUSTOM_PAK_DIRECTORY_PATH);
-    ImGui::Text("Restart the game to apply changes.");
+    ImGui::Text(REF_TR("Allow loading PAKs inside %s directory. PAKs can be of any filename and ends with .pak (case-sensitive)"), IntegrityCheckBypass::CUSTOM_PAK_DIRECTORY_PATH);
+    ImGui::Text(REF_TR("Restart the game to apply changes."));
 
     auto changed = false;
-    changed |= m_load_pak_directory->draw("Enable");
+    changed |= m_load_pak_directory->draw(REF_TR("Enable"));
 
     if (changed) {
         g_framework->request_save_config();
     }
 
-    if (ImGui::TreeNode("List of custom PAKs loaded:")) {
+    if (ImGui::TreeNode(REF_TR("List of custom PAKs loaded:"))) {
         for (const auto& pak_path : m_custom_pak_in_directory_paths) {
             auto pak_utf8 = utility::narrow(pak_path);
             ImGui::BulletText("%s", pak_utf8.c_str());

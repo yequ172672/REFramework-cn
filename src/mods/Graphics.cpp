@@ -9,6 +9,7 @@
 #include <sdk/REGameObject.hpp>
 
 #include "VR.hpp"
+#include "../utility/Localization.hpp"
 #include "Graphics.hpp"
 
 #ifdef REFRAMEWORK_UNIVERSAL
@@ -259,12 +260,12 @@ void Graphics::on_draw_ui() {
 
     if (sdk::GameIdentity::get().is_re4()) {
     ImGui::SetNextItemOpen(true, ImGuiCond_::ImGuiCond_Once);
-    if (ImGui::TreeNode("RE4 Scope Tweaks")) {
-        m_scope_tweaks->draw("Enable Scope Tweaks");
+    if (ImGui::TreeNode(REF_TR("RE4 Scope Tweaks"))) {
+        m_scope_tweaks->draw(REF_TR("Enable Scope Tweaks"));
 
         if (m_scope_tweaks->value()) {
-            m_scope_interlaced_rendering->draw("Enable Interlaced Rendering");
-            m_scope_image_quality->draw("Scope Image Quality");
+            m_scope_interlaced_rendering->draw(REF_TR("Enable Interlaced Rendering"));
+            m_scope_image_quality->draw(REF_TR("Scope Image Quality"));
         }
 
         ImGui::TreePop();
@@ -272,84 +273,84 @@ void Graphics::on_draw_ui() {
     }
 
     ImGui::SetNextItemOpen(true, ImGuiCond_::ImGuiCond_Once);
-    if (ImGui::TreeNode("Ultrawide/FOV Options")) {
-        if (m_ultrawide_fix->draw("Ultrawide/FOV/Aspect Ratio Fix") && m_ultrawide_fix->value() == false) {
+    if (ImGui::TreeNode(REF_TR("Ultrawide/FOV Options"))) {
+        if (m_ultrawide_fix->draw(REF_TR("Ultrawide/FOV/Aspect Ratio Fix")) && m_ultrawide_fix->value() == false) {
             do_ultrawide_fov_restore(true);
         }
 
         if (m_ultrawide_fix->value()) {
-            m_ultrawide_16_10_mode->draw("16:10 Mode: Use Black Bars (maintain 16:9)");
+            m_ultrawide_16_10_mode->draw(REF_TR("16:10 Mode: Use Black Bars (maintain 16:9)"));
             if (ImGui::IsItemHovered()) {
-                ImGui::SetTooltip("On a 16:10 display, keeps the game at 16:9 with black bars instead of\n"
-                                  "stretching to fill the screen. Prevents UI element misalignment.");
+                ImGui::SetTooltip(REF_TR("On a 16:10 display, keeps the game at 16:9 with black bars instead of\n"
+                                  "stretching to fill the screen. Prevents UI element misalignment."));
             }
 
             if (!sdk::GameIdentity::get().is_mhwilds()) {
-                m_ultrawide_constrain_ui->draw("Ultrawide: Constrain UI to 16:9");
+                m_ultrawide_constrain_ui->draw(REF_TR("Ultrawide: Constrain UI to 16:9"));
                 if (m_ultrawide_constrain_ui->value()) {
-                    m_ultrawide_constrain_child_ui->draw("Ultrawide: Constrain Child UI to 16:9");
+                    m_ultrawide_constrain_child_ui->draw(REF_TR("Ultrawide: Constrain Child UI to 16:9"));
                 }
             } else {
-                m_ultrawide_ui_correction->draw("Ultrawide: UI Correction");
+                m_ultrawide_ui_correction->draw(REF_TR("Ultrawide: UI Correction"));
             }
-            m_ultrawide_vertical_fov->draw("Ultrawide: Enable Vertical FOV");
-            m_ultrawide_custom_fov->draw("Ultrawide: Override FOV");
-            m_ultrawide_fov_multiplier->draw("Ultrawide: FOV Multiplier");
+            m_ultrawide_vertical_fov->draw(REF_TR("Ultrawide: Enable Vertical FOV"));
+            m_ultrawide_custom_fov->draw(REF_TR("Ultrawide: Override FOV"));
+            m_ultrawide_fov_multiplier->draw(REF_TR("Ultrawide: FOV Multiplier"));
         }
 
-        m_force_render_res_to_window->draw("Force Render Resolution to Window Size");
+        m_force_render_res_to_window->draw(REF_TR("Force Render Resolution to Window Size"));
 
         ImGui::TreePop();
     }
 
     ImGui::SetNextItemOpen(true, ImGuiCond_::ImGuiCond_Once);
-    if (ImGui::TreeNode("GUI Options")) {
-        m_disable_gui->draw("Hide GUI");
-        m_disable_gui_key->draw("Hide GUI key");
+    if (ImGui::TreeNode(REF_TR("GUI Options"))) {
+        m_disable_gui->draw(REF_TR("Hide GUI"));
+        m_disable_gui_key->draw(REF_TR("Hide GUI key"));
         ImGui::TreePop();
     }
 
     if (sdk::GameIdentity::get().tdb_ver() >= 69) {
         ImGui::SetNextItemOpen(true, ImGuiCond_::ImGuiCond_Once);
-        if (ImGui::TreeNode("Ray Tracing Tweaks")) {
-            m_ray_tracing_tweaks->draw("Enable Ray Tracing Tweaks");
+        if (ImGui::TreeNode(REF_TR("Ray Tracing Tweaks"))) {
+            m_ray_tracing_tweaks->draw(REF_TR("Enable Ray Tracing Tweaks"));
 
             if (m_ray_tracing_tweaks->value()) {
-                m_ray_trace_disable_raster_shadows->draw("Disable Raster Shadows (with PT)");
-                m_ray_trace_always_recreate_rt_component->draw("Always Recreate RT Component");
+                m_ray_trace_disable_raster_shadows->draw(REF_TR("Disable Raster Shadows (with PT)"));
+                m_ray_trace_always_recreate_rt_component->draw(REF_TR("Always Recreate RT Component"));
                 // Description of the above option
                 if (ImGui::IsItemHovered()) {
-                    ImGui::SetTooltip("Recreates the RT component. Useful if Ray Tracing Tweaks is not working.");
+                    ImGui::SetTooltip(REF_TR("Recreates the RT component. Useful if Ray Tracing Tweaks is not working."));
                 }
-                m_ray_trace_type->draw("Ray Trace Type");
+                m_ray_trace_type->draw(REF_TR("Ray Trace Type"));
 
                 const auto clone_tooltip = 
-                        "Can draw another RT pass over the main RT pass. Useful for hybrid rendering.\n"
+                        REF_TR("Can draw another RT pass over the main RT pass. Useful for hybrid rendering.\n"
                         "Example: Set Ray Trace Type to Pure and Ray Trace Clone Type to ASVGF. This adds RTGI to the path traced image.\n"
-                        "Path Space Filter is also another good alternative for RTGI but it costs more performance.\n";
+                        "Path Space Filter is also another good alternative for RTGI but it costs more performance.\n");
 
-                m_ray_trace_clone_type_pre->draw("Ray Trace Clone Type Pre");
+                m_ray_trace_clone_type_pre->draw(REF_TR("Ray Trace Clone Type Pre"));
                 if (ImGui::IsItemHovered()) {
                     ImGui::SetTooltip(clone_tooltip);
                 }
 
-                m_ray_trace_clone_type_post->draw("Ray Trace Clone Type Post");
+                m_ray_trace_clone_type_post->draw(REF_TR("Ray Trace Clone Type Post"));
                 if (ImGui::IsItemHovered()) {
                     ImGui::SetTooltip(clone_tooltip);
                 }
                 
-                m_ray_trace_clone_type_true->draw("Ray Trace Clone Type True");
+                m_ray_trace_clone_type_true->draw(REF_TR("Ray Trace Clone Type True"));
                 if (ImGui::IsItemHovered()) {
                     const auto true_tooltip =
-                        "Uses a completely separate RT component instead of re-using the main RT component.\n"
-                        "Might crash or have other issues. Use with caution.\n";
+                        REF_TR("Uses a completely separate RT component instead of re-using the main RT component.\n"
+                        "Might crash or have other issues. Use with caution.\n");
                     ImGui::SetTooltip(true_tooltip);
                 }
 
                 // Hybrid/pure
                 if (is_pt_type(m_ray_trace_type->value()) || is_pt_type(m_ray_trace_clone_type_true->value())) {
-                    m_bounce_count->draw("Bounce Count");
-                    m_samples_per_pixel->draw("Samples Per Pixel");
+                    m_bounce_count->draw(REF_TR("Bounce Count"));
+                    m_samples_per_pixel->draw(REF_TR("Samples Per Pixel"));
                 }
             }
 
@@ -357,8 +358,8 @@ void Graphics::on_draw_ui() {
         }
 
         ImGui::SetNextItemOpen(true, ImGuiCond_::ImGuiCond_Once);
-        if (ImGui::TreeNode("Shader Playground")) {
-            m_shader_playground->draw("Enable Shader Playground");
+        if (ImGui::TreeNode(REF_TR("Shader Playground"))) {
+            m_shader_playground->draw(REF_TR("Enable Shader Playground"));
 
             if (m_shader_playground->value()) {  
                 //for (size_t i = 0; i < m_replacement_shaders.size(); ++i) {
@@ -369,12 +370,12 @@ void Graphics::on_draw_ui() {
 
                     const auto interception_node_open = ImGui::TreeNode("");
                     ImGui::SameLine();
-                    if (ImGui::InputText("Interception Shader", intercepted.name.data(), intercepted.name.size())) {
+                    if (ImGui::InputText(REF_TR("Interception Shader"), intercepted.name.data(), intercepted.name.size())) {
                         intercepted.hash = sdk::murmur_hash::calc32_as_utf8(intercepted.name.data());
                     }
 
                     if (interception_node_open) {
-                        if (ImGui::InputText(std::format("Replace Shader", i).c_str(), intercepted.replace_with_name.data(), intercepted.replace_with_name.size())) {
+                        if (ImGui::InputText(REF_TR("Replace Shader"), intercepted.replace_with_name.data(), intercepted.replace_with_name.size())) {
                             intercepted.replace_with_hash = sdk::murmur_hash::calc32_as_utf8(intercepted.replace_with_name.data());
                         }
 
@@ -383,19 +384,19 @@ void Graphics::on_draw_ui() {
                             ImGui::PushID(std::format("Shader {}", i).c_str());
                             const auto node_open = ImGui::TreeNodeEx("");
                             ImGui::SameLine();
-                            if (ImGui::InputText(std::format("Custom Shader {}", i).c_str(), replacement.shader.data(), replacement.shader.size())) {
+                            if (ImGui::InputText(std::vformat(REF_TR("Custom Shader {}"), std::make_format_args(i)).c_str(), replacement.shader.data(), replacement.shader.size())) {
                                 replacement.hash = sdk::murmur_hash::calc32_as_utf8(replacement.shader.data());
                             }
 
                             if (node_open) {
-                                ImGui::Combo("Dispatch Mode", (int*)&replacement.dispatch_mode, s_shader_dispatch_modes.data(), s_shader_dispatch_modes.size());
+                                ImGui::Combo(REF_TR("Dispatch Mode"), (int*)&replacement.dispatch_mode, s_shader_dispatch_modes.data(), s_shader_dispatch_modes.size());
 
-                                ImGui::InputInt("Thread Group X", (int32_t*)&replacement.thread_group_x);
-                                ImGui::InputInt("Thread Group Y", (int32_t*)&replacement.thread_group_y);
-                                ImGui::InputInt("Thread Group Z", (int32_t*)&replacement.thread_group_z);
-                                ImGui::InputInt("Constant", (int32_t*)&replacement.constant);
+                                ImGui::InputInt(REF_TR("Thread Group X"), (int32_t*)&replacement.thread_group_x);
+                                ImGui::InputInt(REF_TR("Thread Group Y"), (int32_t*)&replacement.thread_group_y);
+                                ImGui::InputInt(REF_TR("Thread Group Z"), (int32_t*)&replacement.thread_group_z);
+                                ImGui::InputInt(REF_TR("Constant"), (int32_t*)&replacement.constant);
 
-                                ImGui::Checkbox("Valid hash", &replacement.valid_hash);
+                                ImGui::Checkbox(REF_TR("Valid hash"), &replacement.valid_hash);
 
                                 ImGui::TreePop();
                             }

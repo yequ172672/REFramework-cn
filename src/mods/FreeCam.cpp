@@ -5,6 +5,8 @@
 
 #include "HookManager.hpp"
 
+#include "../utility/Localization.hpp"
+
 #include "FreeCam.hpp"
 
 using namespace utility;
@@ -43,31 +45,31 @@ void FreeCam::on_draw_ui() {
         return;
     }
 
-    if (m_enabled->draw("Enabled")) {
+    if (m_enabled->draw(REF_TR("Enabled"))) {
         m_first_time = true;
     }
 
     ImGui::SameLine();
-    m_lock_camera->draw("Lock Position");
+    m_lock_camera->draw(REF_TR("Lock Position"));
 
     if (sdk::GameIdentity::get().is_re2() || sdk::GameIdentity::get().is_re3() || sdk::GameIdentity::get().is_re8() || sdk::GameIdentity::get().is_re4()) {
-        m_disable_movement->draw("Disable Character Movement");
+        m_disable_movement->draw(REF_TR("Disable Character Movement"));
     }
 
-    m_toggle_key->draw("Toggle Key");
-    m_move_up_key->draw("Move camera up Key");
-    m_move_down_key->draw("Move camera down Key");
-    m_lock_camera_key->draw("Lock Position Toggle Key");
+    m_toggle_key->draw(REF_TR("Toggle Key"));
+    m_move_up_key->draw(REF_TR("Move camera up Key"));
+    m_move_down_key->draw(REF_TR("Move camera down Key"));
+    m_lock_camera_key->draw(REF_TR("Lock Position Toggle Key"));
     if (sdk::GameIdentity::get().is_re2() || sdk::GameIdentity::get().is_re3() || sdk::GameIdentity::get().is_re8() || sdk::GameIdentity::get().is_re4()) {
-        m_disable_movement_key->draw("Disable Movement Toggle Key");
+        m_disable_movement_key->draw(REF_TR("Disable Movement Toggle Key"));
     }
-    m_speed_modifier_fast_key->draw("Speed modifier Fast key");
-    m_speed_modifier_slow_key->draw("Speed modifier Slow key");
+    m_speed_modifier_fast_key->draw(REF_TR("Speed modifier Fast key"));
+    m_speed_modifier_slow_key->draw(REF_TR("Speed modifier Slow key"));
 
-    m_rotation_speed->draw("Rotation Speed");
+    m_rotation_speed->draw(REF_TR("Rotation Speed"));
 
-    m_speed->draw("Speed");
-    m_speed_modifier->draw("Speed Modifier");
+    m_speed->draw(REF_TR("Speed"));
+    m_speed_modifier->draw(REF_TR("Speed Modifier"));
 }
 
 enum class MoveDirection : uint8_t {

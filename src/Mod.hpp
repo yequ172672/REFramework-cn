@@ -14,6 +14,7 @@
 #include <sdk/ReClass.hpp>
 #include <sdk/Renderer.hpp>
 #include "utility/Config.hpp"
+#include "utility/Localization.hpp"
 
 #include "REFramework.hpp"
 
@@ -357,7 +358,7 @@ public:
             }
 
             ImGui::SameLine();
-            ImGui::Text("Press any key...");
+            ImGui::Text(REF_TR("Press any key..."));
         }
         else {
             ImGui::SameLine();
@@ -366,7 +367,7 @@ public:
                 ImGui::Text("%i", m_value);
             }
             else {
-                ImGui::Text("Not bound");
+                ImGui::Text(REF_TR("Not bound"));
             }
         }
 

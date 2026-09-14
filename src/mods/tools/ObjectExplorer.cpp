@@ -14,6 +14,7 @@
 #include <utility/Module.hpp>
 #include <utility/Memory.hpp>
 #include <utility/ImGui.hpp>
+#include "../../utility/Localization.hpp"
 #include "sdk/Renderer.hpp"
 #include "sdk/MotionFsm2Layer.hpp"
 
@@ -370,13 +371,13 @@ void ObjectExplorer::on_draw_dev_ui() {
     if (!m_do_init && !ImGui::CollapsingHeader(get_name().data())) {
         return;
     }
-    if (ImGui::Button("Dump SDK")) {
+    if (ImGui::Button(REF_TR("Dump SDK"))) {
         std::thread t(&ObjectExplorer::generate_sdk, this, false);
         t.detach();
     }
     
     ImGui::SameLine();
-    if (ImGui::Button("Dump il2cpp json Only")) {
+    if (ImGui::Button(REF_TR("Dump il2cpp json Only"))) {
         std::thread t(&ObjectExplorer::generate_sdk, this, true);
         t.detach();
     }
@@ -390,35 +391,35 @@ void ObjectExplorer::on_draw_dev_ui() {
             progress = 0.0f;
             break;
         case SdkDumpStage::DUMP_INITIALIZATION:
-            overlay = "Initializing Dump...";
+            overlay = REF_TR("Initializing Dump...");
             progress = static_cast<float>(ImGui::GetTime()) * -0.35f;
             break;
         case SdkDumpStage::DUMP_TYPES: 
-            overlay = "Dumping Types...";
+            overlay = REF_TR("Dumping Types...");
             break;
         case SdkDumpStage::DUMP_RSZ:
-            overlay = "Dumping RSZ...";
+            overlay = REF_TR("Dumping RSZ...");
             break;
         case SdkDumpStage::DUMP_METHODS:
-            overlay = "Dumping Methods...";
+            overlay = REF_TR("Dumping Methods...");
             break;
         case SdkDumpStage::DUMP_FIELDS:
-            overlay = "Dumping Fields...";
+            overlay = REF_TR("Dumping Fields...");
             break;
         case SdkDumpStage::DUMP_PROPERTIES:
-            overlay = "Dumping Properties...";
+            overlay = REF_TR("Dumping Properties...");
             break;
         case SdkDumpStage::DUMP_RSZ_2:
-            overlay = "Adjusting RSZ...";
+            overlay = REF_TR("Adjusting RSZ...");
             break;
         case SdkDumpStage::DUMP_DESERIALIZER_CHAIN:
-            overlay = "Dumping Deserializer Chains...";
+            overlay = REF_TR("Dumping Deserializer Chains...");
             break;
         case SdkDumpStage::DUMP_NON_TDB_TYPES:
-            overlay = "Dumping Non-TDB Types...";
+            overlay = REF_TR("Dumping Non-TDB Types...");
             break;
         case SdkDumpStage::GENERATE_SDK:
-            overlay = "Generating IDA SDK...";
+            overlay = REF_TR("Generating IDA SDK...");
             progress = static_cast<float>(ImGui::GetTime()) * -0.35f;
             break;
         default: 
@@ -432,7 +433,7 @@ void ObjectExplorer::on_draw_dev_ui() {
     auto curtime = std::chrono::system_clock::now();
 
     // List of globals to choose from
-    if (ImGui::CollapsingHeader("Singletons")) {
+    if (ImGui::CollapsingHeader(REF_TR("Singletons"))) {
         if (curtime > m_next_refresh) {
             reframework::get_globals()->safe_refresh();
             m_next_refresh = curtime + std::chrono::seconds(1);
@@ -479,7 +480,7 @@ void ObjectExplorer::on_draw_dev_ui() {
         }
     }
 
-    if (ImGui::CollapsingHeader("Native Singletons")) {
+    if (ImGui::CollapsingHeader(REF_TR("Native Singletons"))) {
         auto& native_singletons = reframework::get_globals()->get_native_singleton_types();
 
         // Display the nodes
@@ -497,30 +498,30 @@ void ObjectExplorer::on_draw_dev_ui() {
         }
     }
 
-    if (ImGui::CollapsingHeader("Renderer")) {
+    if (ImGui::CollapsingHeader(REF_TR("Renderer"))) {
         auto root_layer = sdk::renderer::get_root_layer();
-        ImGui::Text("Root layer: 0x%p", root_layer);
+        ImGui::Text(REF_TR("Root layer: 0x%p"), root_layer);
 
         if (root_layer != nullptr) {
             auto [scene_parent, scene_layer] = root_layer->find_layer_recursive("via.render.layer.Scene");
 
             if (scene_layer != nullptr) {
-                ImGui::Text("Scene layer: 0x%p", *scene_layer);
+                ImGui::Text(REF_TR("Scene layer: 0x%p"), *scene_layer);
             }
 
-            if (ImGui::TreeNode("Root Layer")) {
+            if (ImGui::TreeNode(REF_TR("Root Layer"))) {
                 handle_address((void*)root_layer);
                 ImGui::TreePop();
             }
 
-            if (scene_layer != nullptr && ImGui::TreeNode("Scene Layer")) {
+            if (scene_layer != nullptr && ImGui::TreeNode(REF_TR("Scene Layer"))) {
                 handle_address((void*)*scene_layer);
                 ImGui::TreePop();
             }
         }
     }
 
-    if (ImGui::CollapsingHeader("Types")) {
+    if (ImGui::CollapsingHeader(REF_TR("Types"))) {
         std::vector<uint8_t> fake_type{ 0 };
 
         for (const auto& name : m_sorted_types) {
@@ -539,7 +540,7 @@ void ObjectExplorer::on_draw_dev_ui() {
         }
     }
 
-    if (ImGui::CollapsingHeader("Assemblies")) {
+    if (ImGui::CollapsingHeader(REF_TR("Assemblies"))) {
         auto tdb = sdk::RETypeDB::get();
 
         for (auto i = 0; i < tdb->get_num_modules(); ++i) {
@@ -550,10 +551,10 @@ void ObjectExplorer::on_draw_dev_ui() {
             std::string_view location{ module.get_location() != nullptr ? module.get_location() : "Unknown" };
             
             if (ImGui::TreeNode(assembly_name.data())) {
-                ImGui::Text("Location: %s", location.data());
-                ImGui::Text("Module Name: %s", module_name.data());
+                ImGui::Text(REF_TR("Location: %s"), location.data());
+                ImGui::Text(REF_TR("Module Name: %s"), module_name.data());
                 
-                if (ImGui::TreeNode("Assembly Types")) {
+                if (ImGui::TreeNode(REF_TR("Assembly Types"))) {
                     std::vector<uint8_t> fake_type{ 0 };
 
                     for (auto& t_index : module.get_types()) {
@@ -573,7 +574,7 @@ void ObjectExplorer::on_draw_dev_ui() {
                     ImGui::TreePop();
                 }
 
-                if (ImGui::TreeNode("Assembly Methods")) {
+                if (ImGui::TreeNode(REF_TR("Assembly Methods"))) {
                     for (auto& m_index : module.get_methods()) {
                         auto m = tdb->get_method(m_index);
                         if (m == nullptr) {
@@ -585,7 +586,7 @@ void ObjectExplorer::on_draw_dev_ui() {
                     ImGui::TreePop();
                 }
 
-                if (ImGui::TreeNode("Assembly Instantiated Methods")) {
+                if (ImGui::TreeNode(REF_TR("Assembly Instantiated Methods"))) {
                     for (auto& m_index : module.get_instantiated_methods()) {
                         auto m = tdb->get_method(m_index);
                         if (m == nullptr) {
@@ -597,7 +598,7 @@ void ObjectExplorer::on_draw_dev_ui() {
                     ImGui::TreePop();
                 }
 
-                if (ImGui::TreeNode("Assembly Member References")) {
+                if (ImGui::TreeNode(REF_TR("Assembly Member References"))) {
                     for (auto& m_index : module.get_member_references()) {
                         if (auto m = tdb->get_method(m_index); m != nullptr) {
                             attempt_display_method(nullptr, *m, true);
@@ -612,9 +613,9 @@ void ObjectExplorer::on_draw_dev_ui() {
         }
     }
 
-    ImGui::Checkbox("Search using Regex", &m_search_using_regex);
+    ImGui::Checkbox(REF_TR("Search using Regex"), &m_search_using_regex);
 
-    if (m_do_init || ImGui::InputText("Type Name", m_type_name.data(), 256)) {
+    if (m_do_init || ImGui::InputText(REF_TR("Type Name"), m_type_name.data(), 256)) {
         m_displayed_types.clear();
 
         if (auto t = get_type(m_type_name.data())) {
@@ -645,7 +646,7 @@ void ObjectExplorer::on_draw_dev_ui() {
         }
     }
 
-    if (m_do_init || ImGui::InputText("Method Signature", m_type_member.data(), 256)) {
+    if (m_do_init || ImGui::InputText(REF_TR("Method Signature"), m_type_member.data(), 256)) {
         m_displayed_types.clear();
         m_type_field[0] = '\0';
 
@@ -660,7 +661,7 @@ void ObjectExplorer::on_draw_dev_ui() {
         }
     }
 
-    if (m_do_init || ImGui::InputText("Field Signature", m_type_field.data(), 256)) {
+    if (m_do_init || ImGui::InputText(REF_TR("Field Signature"), m_type_field.data(), 256)) {
         m_displayed_types.clear();
         m_type_member[0] = '\0';
 
@@ -675,7 +676,7 @@ void ObjectExplorer::on_draw_dev_ui() {
         }
     }
 
-    if (ImGui::InputText("Method Address", m_method_address.data(), 17, ImGuiInputTextFlags_::ImGuiInputTextFlags_CharsHexadecimal)) {
+    if (ImGui::InputText(REF_TR("Method Address"), m_method_address.data(), 17, ImGuiInputTextFlags_::ImGuiInputTextFlags_CharsHexadecimal)) {
         m_displayed_method = nullptr;
 
         try {
@@ -687,11 +688,11 @@ void ObjectExplorer::on_draw_dev_ui() {
                 }
             }
         } catch (...) {
-            ImGui::Text("Invalid address");
+            ImGui::Text(REF_TR("Invalid address"));
         }
     }
 
-    if (ImGui::InputText("TDB Method Address", m_method_tdb_address.data(), 17, ImGuiInputTextFlags_::ImGuiInputTextFlags_CharsHexadecimal)) {
+    if (ImGui::InputText(REF_TR("TDB Method Address"), m_method_tdb_address.data(), 17, ImGuiInputTextFlags_::ImGuiInputTextFlags_CharsHexadecimal)) {
         m_displayed_method = nullptr;
 
         try {
@@ -708,20 +709,20 @@ void ObjectExplorer::on_draw_dev_ui() {
                     if (((method_address - base) % stride) == 0) {
                         m_displayed_method = (sdk::REMethodDefinition*)method_address;
                     } else {
-                        ImGui::Text("Invalid address");
+                        ImGui::Text(REF_TR("Invalid address"));
                     }
                 } else {
-                    ImGui::Text("Invalid address");
+                    ImGui::Text(REF_TR("Invalid address"));
                 }
             }
         } catch (...) {
-            ImGui::Text("Invalid address");
+            ImGui::Text(REF_TR("Invalid address"));
         }
     }
 
-    ImGui::InputText("REObject Address", m_object_address.data(), 17, ImGuiInputTextFlags_::ImGuiInputTextFlags_CharsHexadecimal);
+    ImGui::InputText(REF_TR("REObject Address"), m_object_address.data(), 17, ImGuiInputTextFlags_::ImGuiInputTextFlags_CharsHexadecimal);
 
-    if (ImGui::Button("Create new game object"))  {
+    if (ImGui::Button(REF_TR("Create new game object")))  {
         auto& pinned = m_pinned_objects.emplace_back();
         const auto gameobject_t = sdk::find_type_definition("via.GameObject");
         const auto create_method = gameobject_t->get_method("create(System.String)");
@@ -772,11 +773,11 @@ void ObjectExplorer::on_frame() {
         ImGui::SetNextWindowSize(ImVec2(200, 400), ImGuiCond_::ImGuiCond_Once);
         ImGui::PushFont(g_framework->get_default_font(), g_framework->get_font_size());
 
-        if (ImGui::Begin("Read Listeners", &open)) {
+        if (ImGui::Begin(REF_TR("Read Listeners"), &open)) {
             std::shared_lock _{m_veh_state.listener_mtx};
 
             for (auto& listener : m_veh_state.read_listeners) {
-                if (ImGui::TreeNode(listener.second->field, "%s [Hits: %d [%d instructions]]", listener.second->field->get_name(), listener.second->hits, listener.second->instructions.size())) {
+                if (ImGui::TreeNode(listener.second->field, REF_TR("%s [Hits: %d [%d instructions]]"), listener.second->field->get_name(), listener.second->hits, listener.second->instructions.size())) {
                     for (auto& instruction : listener.second->instructions) {
                         auto nearest_method = locate_nearest_method(instruction);
 
@@ -808,7 +809,7 @@ void ObjectExplorer::on_frame() {
         ImGui::SetNextWindowSize(ImVec2(200, 400), ImGuiCond_::ImGuiCond_Once);
         ImGui::PushFont(g_framework->get_default_font(), g_framework->get_font_size());
 
-        if (ImGui::Begin("Pinned objects", &open)) {
+        if (ImGui::Begin(REF_TR("Pinned objects"), &open)) {
             display_pins();
 
             ImGui::End();
@@ -830,7 +831,7 @@ void ObjectExplorer::on_frame() {
         ImGui::SetNextWindowSize(ImVec2(400, 800), ImGuiCond_::ImGuiCond_Once);
         ImGui::PushFont(g_framework->get_default_font(), g_framework->get_font_size());
 
-        if (ImGui::Begin("Hooked methods", &open)) {
+        if (ImGui::Begin(REF_TR("Hooked methods"), &open)) {
             display_hooks();
 
             ImGui::End();
@@ -874,19 +875,19 @@ void ObjectExplorer::display_hooks() {
     std::scoped_lock _{m_hooks_context.mtx};
 
     ImGui::SetNextItemOpen(true, ImGuiCond_::ImGuiCond_Once);
-    if (ImGui::TreeNode("Options")) {
-        ImGui::Checkbox("Hide uncalled methods", &m_hooks_context.hide_uncalled_methods);
+    if (ImGui::TreeNode(REF_TR("Options"))) {
+        ImGui::Checkbox(REF_TR("Hide uncalled methods"), &m_hooks_context.hide_uncalled_methods);
 
         ImGui::SameLine();
 
-        if (ImGui::Button("Reset Stats")) {
+        if (ImGui::Button(REF_TR("Reset Stats"))) {
             for (auto& h : m_hooked_methods) {
                 h.reset_stats();
             }
         }
 
         // Combobox of the sort method instead
-        if (ImGui::BeginCombo("Sort by", HooksContext::s_sort_method_names[(uint8_t)m_hooks_context.sort_method])) {
+        if (ImGui::BeginCombo(REF_TR("Sort by"), HooksContext::s_sort_method_names[(uint8_t)m_hooks_context.sort_method])) {
             for (int i = 0; i < HooksContext::s_sort_method_names.size(); i++) {
                 const bool is_selected = (m_hooks_context.sort_method == (HooksContext::SortMethod)i);
 
@@ -903,10 +904,10 @@ void ObjectExplorer::display_hooks() {
         }
 
         // Auto-unhook options
-        ImGui::Checkbox("Enable Auto Unhook", &m_hooks_context.enable_auto_unhook);
+        ImGui::Checkbox(REF_TR("Enable Auto Unhook"), &m_hooks_context.enable_auto_unhook);
 
         if (m_hooks_context.enable_auto_unhook) {
-            if (ImGui::BeginCombo("Auto Unhook When", HooksContext::s_auto_unhook_method_names[(uint8_t)m_hooks_context.auto_unhook_method])) {
+            if (ImGui::BeginCombo(REF_TR("Auto Unhook When"), HooksContext::s_auto_unhook_method_names[(uint8_t)m_hooks_context.auto_unhook_method])) {
                 for (int i = 0; i < HooksContext::s_auto_unhook_method_names.size(); i++) {
                     const bool is_selected = (m_hooks_context.auto_unhook_method == (HooksContext::AutoUnhookMethod)i);
 
@@ -923,7 +924,7 @@ void ObjectExplorer::display_hooks() {
             }
 
             // Always make it editable regardless of the auto unhook method, this is intentional
-            ImGui::InputScalar("Max Call Count", ImGuiDataType_U32, &m_hooks_context.auto_unhook_call_count_threshold);
+            ImGui::InputScalar(REF_TR("Max Call Count"), ImGuiDataType_U32, &m_hooks_context.auto_unhook_call_count_threshold);
         }
 
         ImGui::TreePop();
@@ -987,19 +988,19 @@ void ObjectExplorer::display_hooks() {
         method_context_menu(h.method, h.name);
 
         if (made_node) {
-            ImGui::Checkbox("Skip function call", &h.skip);
-            ImGui::TextWrapped("Call count: %i", h.stats.call_count);
+            ImGui::Checkbox(REF_TR("Skip function call"), &h.skip);
+            ImGui::TextWrapped(REF_TR("Call count: %i"), h.stats.call_count);
 
             ImGui::SameLine();
             const float delta_ms = std::chrono::duration_cast<std::chrono::duration<float, std::milli>>(h.stats.last_call_delta).count();
             const float total_ms = std::chrono::duration_cast<std::chrono::duration<float, std::milli>>(h.stats.total_call_time).count();
-            ImGui::TextWrapped("Time (ms): Delta %f, Total %f", delta_ms, total_ms);
+            ImGui::TextWrapped(REF_TR("Time (ms): Delta %f, Total %f"), delta_ms, total_ms);
 
-            if (ImGui::TreeNode("Info")) {
+            if (ImGui::TreeNode(REF_TR("Info"))) {
                 ImGui::SetNextItemOpen(true, ImGuiCond_::ImGuiCond_Once);
-                if (ImGui::TreeNode("Callers")) {
+                if (ImGui::TreeNode(REF_TR("Callers"))) {
                     // sort callers combo
-                    if (ImGui::BeginCombo("Sort Callers by", HookedMethod::s_sort_callers_names[(uint8_t)h.sort_callers_method])) {
+                    if (ImGui::BeginCombo(REF_TR("Sort Callers by"), HookedMethod::s_sort_callers_names[(uint8_t)h.sort_callers_method])) {
                         for (int i = 0; i < HookedMethod::s_sort_callers_names.size(); i++) {
                             const bool is_selected = (h.sort_callers_method == (HookedMethod::SortCallersMethod)i);
 
@@ -1051,7 +1052,7 @@ void ObjectExplorer::display_hooks() {
                     ImGui::TreePop();
                 }
 
-                if (ImGui::TreeNode("Return Addresses")) {
+                if (ImGui::TreeNode(REF_TR("Return Addresses"))) {
                     for (auto addr : h.return_addresses) {
                         ImGui::Text("0x%p", addr);
 
@@ -1062,7 +1063,7 @@ void ObjectExplorer::display_hooks() {
                     ImGui::TreePop();
                 }
 
-                if (ImGui::TreeNode("Thread IDs")) {
+                if (ImGui::TreeNode(REF_TR("Thread IDs"))) {
                     for (auto tid : h.stats.thread_ids) {
                         ImGui::Text("%i", tid);
                     }
@@ -2695,7 +2696,7 @@ void ObjectExplorer::handle_address(Address address, int32_t offset, Address par
         if (object->get_vm_type() == via::clr::VMObjType::Array) {
             auto arr = (REArrayBase*)object;
 
-            const auto made_array_entries = ImGui::TreeNode(real_address.get(sizeof(REArrayBase)), "Array Entries");
+            const auto made_array_entries = ImGui::TreeNode(real_address.get(sizeof(REArrayBase)), REF_TR("Array Entries"));
 
             ImGui::SameLine();
             ImGui::Text("[%d]", arr->numElements);
@@ -2735,7 +2736,7 @@ void ObjectExplorer::handle_address(Address address, int32_t offset, Address par
             }
         }
 
-        if (ImGui::TreeNode(real_address.ptr(), "AutoGenerated Types")) {
+        if (ImGui::TreeNode(real_address.ptr(), REF_TR("AutoGenerated Types"))) {
             auto size = object->get_size();
 
             for (auto i = (uint32_t)sizeof(void*); i < size; i += sizeof(void*)) {
@@ -2760,7 +2761,7 @@ void ObjectExplorer::handle_address(Address address, int32_t offset, Address par
 void ObjectExplorer::handle_game_object(REGameObject* game_object) {
     ImGui::PushID((void*)game_object);
 
-    if (ImGui::InputText("Add Component", m_add_component_name.data(), 256, ImGuiInputTextFlags_::ImGuiInputTextFlags_EnterReturnsTrue)) {
+    if (ImGui::InputText(REF_TR("Add Component"), m_add_component_name.data(), 256, ImGuiInputTextFlags_::ImGuiInputTextFlags_EnterReturnsTrue)) {
         const auto tdef = sdk::find_type_definition(m_add_component_name.data());
 
         if (tdef != nullptr) {
@@ -2795,9 +2796,9 @@ void ObjectExplorer::handle_game_object(REGameObject* game_object) {
 
     auto game_object_name = game_object->get_name();
 
-    ImGui::Text("Name: %s", game_object_name.c_str());
-    make_tree_offset(game_object, REGameObject::offset_of_transform(), "Transform");
-    make_tree_offset(game_object, REGameObject::offset_of_folder(), "Folder");
+    ImGui::Text(REF_TR("Name: %s"), game_object_name.c_str());
+    make_tree_offset(game_object, REGameObject::offset_of_transform(), REF_TR("Transform"));
+    make_tree_offset(game_object, REGameObject::offset_of_folder(), REF_TR("Folder"));
 
     ImGui::PopID();
 }
@@ -2822,11 +2823,11 @@ void ObjectExplorer::handle_component(REComponent* component) {
         }
     };
 
-    if (ImGui::Button("Destroy Component")) {
+    if (ImGui::Button(REF_TR("Destroy Component"))) {
         sdk::call_object_func<void*>(component, "destroy", sdk::get_thread_context(), component);
     }
 
-    make_tree_offset(component, REComponent::offset_of_game_object(), "Owner", [&](){  display_component_preview(component); });
+    make_tree_offset(component, REComponent::offset_of_game_object(), REF_TR("Owner"), [&](){  display_component_preview(component); });
     //make_tree_offset(component, REComponent::offset_of_child_component(), "ChildComponent");
 
     auto children_offset = REComponent::offset_of_child_component();
@@ -2834,7 +2835,7 @@ void ObjectExplorer::handle_component(REComponent* component) {
 
     // Draw children
     if (children_ptr != nullptr) {
-        auto made_node = ImGui::TreeNode((uint8_t*)component + children_offset, "0x%X: ChildComponents", children_offset);
+        auto made_node = ImGui::TreeNode((uint8_t*)component + children_offset, REF_TR("0x%X: ChildComponents"), children_offset);
         context_menu(children_ptr);
 
         if (made_node) {
@@ -2870,8 +2871,8 @@ void ObjectExplorer::handle_component(REComponent* component) {
         }
     }
 
-    make_tree_offset(component, REComponent::offset_of_prev_component(), "PrevComponent", [&](){ display_component_preview(component->get_prev_component()); });
-    make_tree_offset(component, REComponent::offset_of_next_component(), "NextComponent", [&](){ display_component_preview(component->get_next_component()); });
+    make_tree_offset(component, REComponent::offset_of_prev_component(), REF_TR("PrevComponent"), [&](){ display_component_preview(component->get_prev_component()); });
+    make_tree_offset(component, REComponent::offset_of_next_component(), REF_TR("NextComponent"), [&](){ display_component_preview(component->get_next_component()); });
 }
 
 void ObjectExplorer::handle_transform(RETransform* transform) {
@@ -2879,11 +2880,11 @@ void ObjectExplorer::handle_transform(RETransform* transform) {
 }
 
 void ObjectExplorer::handle_render_layer(sdk::renderer::RenderLayer* layer) {
-    if (ImGui::Button("Attempt to Clone")) {
+    if (ImGui::Button(REF_TR("Attempt to Clone"))) {
         layer->add_layer(layer->get_type_definition()->get_type(), layer->m_priority)->clone_layers(layer);
     }
 
-    const auto made_node = ImGui::TreeNode(&layer->m_layers, "Child Layers");
+    const auto made_node = ImGui::TreeNode(&layer->m_layers, REF_TR("Child Layers"));
     context_menu(&layer->m_layers);
 
     if (made_node) {
@@ -2898,7 +2899,7 @@ void ObjectExplorer::handle_render_layer(sdk::renderer::RenderLayer* layer) {
 }
 
 void ObjectExplorer::handle_behavior_tree(sdk::behaviortree::BehaviorTree* bhvt) {
-    const auto made_node = ImGui::TreeNode(&bhvt->trees, "Trees");
+    const auto made_node = ImGui::TreeNode(&bhvt->trees, REF_TR("Trees"));
 
     if (made_node) {
         int32_t count = 0;
@@ -2912,7 +2913,7 @@ void ObjectExplorer::handle_behavior_tree(sdk::behaviortree::BehaviorTree* bhvt)
 }
 
 void ObjectExplorer::handle_behavior_tree_core_handle(sdk::behaviortree::BehaviorTree* bhvt, sdk::behaviortree::CoreHandle* bhvt_core_handle, uint32_t tree_idx) {
-    const auto made_node = ImGui::TreeNode(&bhvt_core_handle->core.tree_object, "Nodes");
+    const auto made_node = ImGui::TreeNode(&bhvt_core_handle->core.tree_object, REF_TR("Nodes"));
 
     if (made_node) {
         int32_t count = 0;
@@ -2950,11 +2951,11 @@ void ObjectExplorer::handle_behavior_tree_node(sdk::behaviortree::BehaviorTree* 
     const auto made_node = ImGui::TreeNode(node, node_full_name.data());
 
     if (made_node) {
-        ImGui::Text("ID: %u", node->get_id());
-        ImGui::Text("Status1: %i", (int32_t)node->get_status1());
-        ImGui::Text("Status2: %i", (int32_t)node->get_status2());
+        ImGui::Text(REF_TR("ID: %u"), node->get_id());
+        ImGui::Text(REF_TR("Status1: %i"), (int32_t)node->get_status1());
+        ImGui::Text(REF_TR("Status2: %i"), (int32_t)node->get_status2());
 
-        if (ImGui::TreeNode("Children")) {
+        if (ImGui::TreeNode(REF_TR("Children"))) {
             for (auto child : node->get_children()) {
                 handle_behavior_tree_node(bhvt, child, tree_idx);
             }
@@ -2962,13 +2963,13 @@ void ObjectExplorer::handle_behavior_tree_node(sdk::behaviortree::BehaviorTree* 
             ImGui::TreePop();
         }
 
-        if (ImGui::TreeNode("Selector")) {
+        if (ImGui::TreeNode(REF_TR("Selector"))) {
             handle_address(node->get_selector());
 
             ImGui::TreePop();
         }
 
-        if (ImGui::TreeNode("Selector Condition")) {
+        if (ImGui::TreeNode(REF_TR("Selector Condition"))) {
             handle_address(node->get_selector_condition());
 
             ImGui::TreePop();
@@ -3003,7 +3004,7 @@ void ObjectExplorer::handle_type(REManagedObject* obj, REType* t) {
 
         // top
         if (is_singleton && type_info == t) {
-            make_same_line_text("SINGLETON", ImVec4{1.0f, 0.0f, 0.0f, 1.0f}); 
+            make_same_line_text(REF_TR("SINGLETON"), ImVec4{1.0f, 0.0f, 0.0f, 1.0f}); 
         }
 
         if (!made_node) {
@@ -3019,19 +3020,19 @@ void ObjectExplorer::handle_type(REManagedObject* obj, REType* t) {
 
         // Topmost type
         if (type_info == t && is_real_object) {
-            ImGui::Text("Size: 0x%X", obj->get_size());
+            ImGui::Text(REF_TR("Size: 0x%X"), obj->get_size());
         }
         // Super types
         else {
-            ImGui::Text("Size: 0x%X", get_size(type_info));
+            ImGui::Text(REF_TR("Size: 0x%X"), get_size(type_info));
         }
 
         ++count;
 
         // Display type flags
         if (get_classInfo(type_info) != nullptr) {
-            if (stretched_tree_node("Type Information")) {
-                if (stretched_tree_node("TypeFlags")) {
+            if (stretched_tree_node(REF_TR("Type Information"))) {
+                if (stretched_tree_node(REF_TR("TypeFlags"))) {
                     display_enum_value("via.clr.TypeFlag", (int64_t)((sdk::RETypeDefinition*)get_classInfo(type_info))->get_flags());
                     ImGui::TreePop();
                 }
@@ -3042,8 +3043,8 @@ void ObjectExplorer::handle_type(REManagedObject* obj, REType* t) {
                     const auto generic_td = td->get_generic_type_definition();
 
                     if (generic_td != nullptr) {
-                        if (stretched_tree_node("Generic Type Definition")) {
-                            ImGui::Text("Name: %s", generic_td->get_full_name().c_str()); // just in-case the get_type() returns nullptr.
+                        if (stretched_tree_node(REF_TR("Generic Type Definition"))) {
+                            ImGui::Text(REF_TR("Name: %s"), generic_td->get_full_name().c_str()); // just in-case the get_type() returns nullptr.
                             display_native_methods(nullptr, generic_td);
                             display_native_fields(nullptr, generic_td);
                             ImGui::TreePop();
@@ -3067,7 +3068,7 @@ void ObjectExplorer::handle_type(REManagedObject* obj, REType* t) {
         if (i == count - 1 && is_top_type_open && is_singleton && !is_real_obj) {
             auto singleton_obj = utility::re_type::get_singleton_instance(t);
 
-            if (singleton_obj != nullptr && ImGui::TreeNode(singleton_obj, "AutoGenerated Types")) {
+            if (singleton_obj != nullptr && ImGui::TreeNode(singleton_obj, REF_TR("AutoGenerated Types"))) {
                 auto size = get_size(t);
 
                 for (auto i = (uint32_t)sizeof(void*); i < size; i += sizeof(void*)) {
@@ -3132,7 +3133,7 @@ void ObjectExplorer::display_reflection_methods(REManagedObject* obj, REType* ty
 
     auto num_methods = get_fields(type_info)->get_num();
 
-    if (ImGui::TreeNode(methods, "Reflection Methods: %i", num_methods)) {
+    if (ImGui::TreeNode(methods, REF_TR("Reflection Methods: %i"), num_methods)) {
         for (auto i = 0; i < num_methods; ++i) {
             volatile auto top = (*methods)[i];
 
@@ -3160,10 +3161,10 @@ void ObjectExplorer::display_reflection_methods(REManagedObject* obj, REType* ty
             }
 
             if (made_node) {
-                ImGui::Text("Address: 0x%p", descriptor);
-                ImGui::Text("Function: 0x%p", descriptor->get_functionPtr());
+                ImGui::Text(REF_TR("Address: 0x%p"), descriptor);
+                ImGui::Text(REF_TR("Function: 0x%p"), descriptor->get_functionPtr());
 
-                if (descriptor->get_functionPtr() != nullptr && ImGui::Button("Attempt to call")) {
+                if (descriptor->get_functionPtr() != nullptr && ImGui::Button(REF_TR("Attempt to call"))) {
                     char poop[0x100]{ 0 };
                     obj->call_method(descriptor->get_name(), poop);
                 }
@@ -3171,7 +3172,7 @@ void ObjectExplorer::display_reflection_methods(REManagedObject* obj, REType* ty
                 auto t2 = get_type(ret);
 
                 if (t2 == nullptr || t2 == type_info) {
-                    ImGui::Text("Type: %s", ret.c_str());
+                    ImGui::Text(REF_TR("Type: %s"), ret.c_str());
                 }
                 else {
                     std::vector<uint8_t> fake_object(get_size(t2), 0);
@@ -3196,7 +3197,7 @@ void ObjectExplorer::display_reflection_properties(REManagedObject* obj, REType*
     const auto is_real_object = REManagedObject::is_managed_object(obj);
     auto descriptors = get_fields(type_info)->get_variables()->data->descriptors;
 
-    if (ImGui::TreeNode(get_fields(type_info), "Reflection Properties: %i", get_fields(type_info)->get_variables()->num)) {
+    if (ImGui::TreeNode(get_fields(type_info), REF_TR("Reflection Properties: %i"), get_fields(type_info)->get_variables()->num)) {
         for (auto i = descriptors; i != descriptors + get_fields(type_info)->get_variables()->num; ++i) {
             auto variable = *i;
 
@@ -3243,7 +3244,7 @@ void ObjectExplorer::display_reflection_properties(REManagedObject* obj, REType*
 
                     local_obj = (REManagedObject*)sdk::VM::get()->get_static_tbl_for_type(type_index);
 
-                    make_same_line_text("STATIC", ImVec4{ 1.0f, 0.0f, 0.0f, 1.0f });
+                    make_same_line_text(REF_TR("STATIC"), ImVec4{ 1.0f, 0.0f, 0.0f, 1.0f });
                 }
             } else {
                 allowed = is_real_object || utility::re_type::is_singleton(type_info);
@@ -3255,16 +3256,16 @@ void ObjectExplorer::display_reflection_properties(REManagedObject* obj, REType*
                     attempt_display_field(local_obj, variable, type_info);
                 }
 
-                if (ImGui::TreeNode(variable, "Additional Information")) {
-                    ImGui::Text("Address: 0x%p", variable);
-                    ImGui::Text("Function: 0x%p", variable->get_function());
+                if (ImGui::TreeNode(variable, REF_TR("Additional Information"))) {
+                    ImGui::Text(REF_TR("Address: 0x%p"), variable);
+                    ImGui::Text(REF_TR("Function: 0x%p"), variable->get_function());
 
                     // Display type information
                     if (variable->get_typeName() != nullptr) {
                         auto t2 = get_type(variable->get_typeName());
 
                         if (t2 == nullptr || t2 == type_info) {
-                            ImGui::Text("Type: %s", variable->get_typeName());
+                            ImGui::Text(REF_TR("Type: %s"), variable->get_typeName());
                         }
                         else {
                             std::vector<uint8_t> fake_object(get_size(t2), 0);
@@ -3275,16 +3276,16 @@ void ObjectExplorer::display_reflection_properties(REManagedObject* obj, REType*
 
                     auto prop_flags = utility::reflection_property::get_flags(variable);
 
-                    ImGui::Text("TypeKind: %i (%s)", prop_flags.type_kind, get_enum_value_name("via.reflection.TypeKind", (int64_t)prop_flags.type_kind).c_str());
-                    ImGui::Text("Qualifiers: %i", prop_flags.type_qual);
-                    ImGui::Text("Attributes: %i", prop_flags.type_attr);
+                    ImGui::Text(REF_TR("TypeKind: %i (%s)"), prop_flags.type_kind, get_enum_value_name("via.reflection.TypeKind", (int64_t)prop_flags.type_kind).c_str());
+                    ImGui::Text(REF_TR("Qualifiers: %i"), prop_flags.type_qual);
+                    ImGui::Text(REF_TR("Attributes: %i"), prop_flags.type_attr);
                     
-                    ImGui::Text("Size: %i", utility::reflection_property::get_size(variable));
-                    ImGui::Text("ManagedStr: %i", prop_flags.managed_str);
-                    ImGui::Text("VarType: %i", variable->get_variableType());
+                    ImGui::Text(REF_TR("Size: %i"), utility::reflection_property::get_size(variable));
+                    ImGui::Text(REF_TR("ManagedStr: %i"), prop_flags.managed_str);
+                    ImGui::Text(REF_TR("VarType: %i"), variable->get_variableType());
 
                     if (variable->get_staticVariableData() != nullptr) {
-                        ImGui::Text("GlobalIndex: %i", variable->get_staticVariableData()->variableIndex);
+                        ImGui::Text(REF_TR("GlobalIndex: %i"), variable->get_staticVariableData()->variableIndex);
                     }
 
                     ImGui::TreePop();
@@ -3315,7 +3316,7 @@ void ObjectExplorer::display_native_fields(REManagedObject* obj, sdk::RETypeDefi
 
     auto tdb = reframework::get_types()->get_type_db();
 
-    if (ImGui::TreeNode(*fields.begin(), "TDB Fields: %i", fields.size())) {
+    if (ImGui::TreeNode(*fields.begin(), REF_TR("TDB Fields: %i"), fields.size())) {
         for (auto f : fields) {
             if (!is_filtered_field(*f)) {
                 continue;
@@ -3342,11 +3343,11 @@ void ObjectExplorer::display_native_fields(REManagedObject* obj, sdk::RETypeDefi
 
             // Handle static fields
             if ((field_flags & (uint16_t)via::clr::FieldFlag::Static) != 0) {
-                postfixes.push_back("STATIC");
+                postfixes.push_back(REF_TR("STATIC"));
 
                 // Const
                 if ((field_flags & (uint16_t)via::clr::FieldFlag::Literal) != 0) {
-                    postfixes.push_back("CONST");
+                    postfixes.push_back(REF_TR("CONST"));
 
                     data = f->get_init_data();
                     ptr_to_data = data;
@@ -3392,7 +3393,7 @@ void ObjectExplorer::display_native_fields(REManagedObject* obj, sdk::RETypeDefi
             const auto made_node = widget_with_context(data, field_name, 
                 [&]() { return stretched_tree_node(f, "%s", field_type_name.c_str()); },
                 [&]() {
-                    if (is_real_object && ptr_to_data != nullptr && ImGui::Selectable("Listen for reads")) {
+                    if (is_real_object && ptr_to_data != nullptr && ImGui::Selectable(REF_TR("Listen for reads"))) {
                         install_veh();
                         m_veh_state.add_read_listener((uintptr_t)data, f);
                     }
@@ -3553,30 +3554,30 @@ void ObjectExplorer::attempt_display_method(REManagedObject* obj, sdk::REMethodD
     
     if (method_ptr == nullptr || is_stub) {
         ImGui::SameLine();
-        ImGui::TextColored(ImVec4{ 1.0f, 0.0f, 0.0f, 1.0f }, "STUB");
+        ImGui::TextColored(ImVec4{ 1.0f, 0.0f, 0.0f, 1.0f }, REF_TR("STUB"));
     }
 
     bool is_duplicate = m_function_occurrences[method_ptr] > 5;
 
     if (is_duplicate) {
         ImGui::SameLine();
-        ImGui::TextColored(ImVec4{ 1.0f, 0.0f, 0.0f, 1.0f }, "DUPLICATE");
+        ImGui::TextColored(ImVec4{ 1.0f, 0.0f, 0.0f, 1.0f }, REF_TR("DUPLICATE"));
     }
 
     // draw the method data
     if (made_node) {
         if (ImGui::BeginTable("##method", 4,  ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable)) {
             ImGui::TableNextColumn();
-            ImGui::Text("Address");
+            ImGui::Text(REF_TR("Address"));
 
             ImGui::TableNextColumn();
-            ImGui::Text("Virtual Index");
+            ImGui::Text(REF_TR("Virtual Index"));
 
             ImGui::TableNextColumn();
-            ImGui::Text("Flags");
+            ImGui::Text(REF_TR("Flags"));
 
             ImGui::TableNextColumn();
-            ImGui::Text("Impl flags");
+            ImGui::Text(REF_TR("Impl flags"));
             
             // address
             ImGui::TableNextColumn();
@@ -3600,11 +3601,11 @@ void ObjectExplorer::attempt_display_method(REManagedObject* obj, sdk::REMethodD
         if (method_param_types.size() > 0) {
             if (ImGui::BeginTable("##params", 3,  ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable)) {
                 ImGui::TableNextColumn();
-                ImGui::Text("Index");
+                ImGui::Text(REF_TR("Index"));
                 ImGui::TableNextColumn();
-                ImGui::Text("Type");
+                ImGui::Text(REF_TR("Type"));
                 ImGui::TableNextColumn();
-                ImGui::Text("Name");
+                ImGui::Text(REF_TR("Name"));
 
                 for (auto i = 0; i < method_param_types.size(); i++) {
                     ImGui::TableNextColumn();
@@ -3633,7 +3634,7 @@ void ObjectExplorer::attempt_display_method(REManagedObject* obj, sdk::REMethodD
 
         if (ImGui::BeginTable("##calls", 1,  ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable)) {
             ImGui::TableNextColumn();
-            ImGui::Text("Called Method");
+            ImGui::Text(REF_TR("Called Method"));
 
             // Show a list of methods this method calls
             if (m_method_meta_infos.contains((uintptr_t)method_ptr)) {
@@ -3648,13 +3649,13 @@ void ObjectExplorer::attempt_display_method(REManagedObject* obj, sdk::REMethodD
 
         if (ImGui::BeginTable("##disassembly", 3,  ImGuiTableFlags_Borders | ImGuiTableFlags_Resizable)) {
             ImGui::TableNextColumn();
-            ImGui::Text("Address");
+            ImGui::Text(REF_TR("Address"));
 
             ImGui::TableNextColumn();
-            ImGui::Text("Bytes");
+            ImGui::Text(REF_TR("Bytes"));
 
             ImGui::TableNextColumn();
-            ImGui::Text("Instruction");
+            ImGui::Text(REF_TR("Instruction"));
 
             // Show a short disassembly of the method
             auto ip = (uintptr_t)method_ptr;
@@ -3713,7 +3714,7 @@ void ObjectExplorer::display_native_methods(REManagedObject* obj, sdk::RETypeDef
         return;
     }
     
-    if (ImGui::TreeNode((void*)&methods, "TDB Methods: %i", methods.size())) {
+    if (ImGui::TreeNode((void*)&methods, REF_TR("TDB Methods: %i"), methods.size())) {
         for (auto& m : methods) {
             if (!is_filtered_method(m)) {
                 continue;
@@ -3743,7 +3744,7 @@ void ObjectExplorer::attempt_display_field(REManagedObject* obj, VariableDescrip
     const auto is_pointer = prop_flags.managed_str || prop_flags.type_attr == 1 || prop_flags.type_attr == 2;
 
     if (is_pointer && *(void**)&raw_data == nullptr) {
-        ImGui::Text("Null pointer");
+        ImGui::Text(REF_TR("Null pointer"));
         return;
     }
 
@@ -3808,7 +3809,7 @@ void ObjectExplorer::attempt_display_field(REManagedObject* obj, VariableDescrip
 
 void ObjectExplorer::display_data(void* data, void* real_data, std::string type_name, bool is_enum, bool managed_str, const sdk::RETypeDefinition* override_def) {
     if (data == nullptr) {
-        ImGui::Text("Null pointer");
+        ImGui::Text(REF_TR("Null pointer"));
         return;
     }
 
@@ -3843,7 +3844,7 @@ void ObjectExplorer::display_data(void* data, void* real_data, std::string type_
         auto obj = sdk::call_native_func_easy<REGameObject*>(data, object_ref_type, "get_Target");
 
         if (obj != nullptr && is_managed_object(obj)) {
-            if (widget_with_context(obj, [&]() { return ImGui::TreeNode(obj, "Ref Target: 0x%p", obj); })) {
+            if (widget_with_context(obj, [&]() { return ImGui::TreeNode(obj, REF_TR("Ref Target: 0x%p"), obj); })) {
                 if (is_managed_object(obj)) {
                     handle_address(obj);
                 }
@@ -3861,7 +3862,7 @@ void ObjectExplorer::display_data(void* data, void* real_data, std::string type_
         if (real_data != nullptr) {
             auto& int_val = *(uint64_t*)real_data;
 
-            ImGui::DragScalar("Set Value", ImGuiDataType_U64, &int_val, 1.0f, &min_uint64, &max_uint64);
+            ImGui::DragScalar(REF_TR("Set Value"), ImGuiDataType_U64, &int_val, 1.0f, &min_uint64, &max_uint64);
         }
 
         break;
@@ -3872,7 +3873,7 @@ void ObjectExplorer::display_data(void* data, void* real_data, std::string type_
         if (real_data != nullptr) {
             auto& int_val = *(int64_t*)real_data;
 
-            ImGui::DragScalar("Set Value", ImGuiDataType_S64, &int_val, 1.0f, &min_int64, &max_int64);
+            ImGui::DragScalar(REF_TR("Set Value"), ImGuiDataType_S64, &int_val, 1.0f, &min_int64, &max_int64);
         }
 
         break;
@@ -3883,7 +3884,7 @@ void ObjectExplorer::display_data(void* data, void* real_data, std::string type_
         if (real_data != nullptr) {
             auto& int_val = *(uint32_t*)real_data;
 
-            ImGui::DragScalar("Set Value", ImGuiDataType_U32, &int_val, 1.0f, &min_uint, &max_uint);
+            ImGui::DragScalar(REF_TR("Set Value"), ImGuiDataType_U32, &int_val, 1.0f, &min_uint, &max_uint);
         }
 
         break;
@@ -3894,7 +3895,7 @@ void ObjectExplorer::display_data(void* data, void* real_data, std::string type_
         if (real_data != nullptr) {
             auto& int_val = *(int32_t*)real_data;
 
-            ImGui::DragInt("Set Value", (int*)&int_val, 1.0f, min_int, max_int);
+            ImGui::DragInt(REF_TR("Set Value"), (int*)&int_val, 1.0f, min_int, max_int);
         }
 
         break;
@@ -3906,7 +3907,7 @@ void ObjectExplorer::display_data(void* data, void* real_data, std::string type_
         if (real_data != nullptr) {
             auto& int_val = *(uint16_t*)real_data;
 
-            ImGui::DragScalar("Set Value", ImGuiDataType_U16, &int_val, 1.0f, &min_u16, &max_u16);
+            ImGui::DragScalar(REF_TR("Set Value"), ImGuiDataType_U16, &int_val, 1.0f, &min_u16, &max_u16);
         }
         break;
 
@@ -3917,7 +3918,7 @@ void ObjectExplorer::display_data(void* data, void* real_data, std::string type_
         if (real_data != nullptr) {
             auto& int_val = *(int16_t*)real_data;
 
-            ImGui::DragScalar("Set Value", ImGuiDataType_S16, &int_val, 1.0f, &min_i16, &max_i16);
+            ImGui::DragScalar(REF_TR("Set Value"), ImGuiDataType_S16, &int_val, 1.0f, &min_i16, &max_i16);
         }
         break;
     case "System.Byte"_fnv:
@@ -3927,7 +3928,7 @@ void ObjectExplorer::display_data(void* data, void* real_data, std::string type_
         if (real_data != nullptr) {
             auto& int_val = *(uint8_t*)real_data;
 
-            ImGui::DragScalar("Set Value", ImGuiDataType_U8, &int_val, 1.0f, &min_u8, &max_u8);
+            ImGui::DragScalar(REF_TR("Set Value"), ImGuiDataType_U8, &int_val, 1.0f, &min_u8, &max_u8);
         }
 
         break;
@@ -3938,7 +3939,7 @@ void ObjectExplorer::display_data(void* data, void* real_data, std::string type_
         if (real_data != nullptr) {
             auto& int_val = *(int8_t*)real_data;
 
-            ImGui::DragScalar("Set Value", ImGuiDataType_S8, &int_val, 1.0f, &min_i8, &max_i8);
+            ImGui::DragScalar(REF_TR("Set Value"), ImGuiDataType_S8, &int_val, 1.0f, &min_i8, &max_i8);
         }
 
         break;
@@ -3951,7 +3952,7 @@ void ObjectExplorer::display_data(void* data, void* real_data, std::string type_
         if (real_data != nullptr) {
             auto& float_val = *(float*)real_data;
 
-            ImGui::DragFloat("Set Value", &float_val, 0.01f, min_float, max_float);
+            ImGui::DragFloat(REF_TR("Set Value"), &float_val, 0.01f, min_float, max_float);
         }
 
         break;
@@ -3960,15 +3961,15 @@ void ObjectExplorer::display_data(void* data, void* real_data, std::string type_
     case "System.Boolean"_fnv:
     case "bool"_fnv:
         if (*(bool*)data) {
-            ImGui::TextUnformatted("true");
+            ImGui::TextUnformatted(REF_TR("true"));
         } else {
-            ImGui::TextUnformatted("false");
+            ImGui::TextUnformatted(REF_TR("false"));
         }
 
         if (real_data != nullptr) {
             auto& bool_val = *(bool*)real_data;
 
-            ImGui::Checkbox("Set Value", &bool_val);
+            ImGui::Checkbox(REF_TR("Set Value"), &bool_val);
         }
 
         break;
@@ -3991,7 +3992,7 @@ void ObjectExplorer::display_data(void* data, void* real_data, std::string type_
         if (real_data != nullptr) {
             auto& vec_val = *(Vector2f*)real_data;
 
-            ImGui::DragFloat2("Set Value", (float*)&vec_val, 0.01f, min_float, max_float);
+            ImGui::DragFloat2(REF_TR("Set Value"), (float*)&vec_val, 0.01f, min_float, max_float);
         }
 
         break;
@@ -4008,7 +4009,7 @@ void ObjectExplorer::display_data(void* data, void* real_data, std::string type_
         if (real_data != nullptr) {
             auto& vec_val = *(Vector3f*)real_data;
 
-            ImGui::DragFloat3("Set Value", (float*)&vec_val, 0.01f, min_float, max_float);
+            ImGui::DragFloat3(REF_TR("Set Value"), (float*)&vec_val, 0.01f, min_float, max_float);
         }
 
         break;
@@ -4022,7 +4023,7 @@ void ObjectExplorer::display_data(void* data, void* real_data, std::string type_
         if (real_data != nullptr) {
             auto& vec_val = *(Vector4f*)real_data;
 
-            ImGui::DragFloat4("Set Value", (float*)&vec_val, 0.01f, min_float, max_float);
+            ImGui::DragFloat4(REF_TR("Set Value"), (float*)&vec_val, 0.01f, min_float, max_float);
         }
 
         break;
@@ -4037,7 +4038,7 @@ void ObjectExplorer::display_data(void* data, void* real_data, std::string type_
                 auto& mat_val = *(glm::mat4*)real_data;
 
                 ImGui::PushID(&mat_val[i]);
-                ImGui::DragFloat4("Set Value", (float*)&mat_val[i], 0.01f, min_float, max_float);
+                ImGui::DragFloat4(REF_TR("Set Value"), (float*)&mat_val[i], 0.01f, min_float, max_float);
                 ImGui::PopID();
             }
         }
@@ -4067,7 +4068,7 @@ void ObjectExplorer::display_data(void* data, void* real_data, std::string type_
                             if (real_data != nullptr) {
                                 auto& int_val = *(int8_t*)real_data;
 
-                                ImGui::DragScalar("Set Value", ImGuiDataType_S8, &int_val, 1.0f, &min_i8, &max_i8);
+                                ImGui::DragScalar(REF_TR("Set Value"), ImGuiDataType_S8, &int_val, 1.0f, &min_i8, &max_i8);
                             }
                             break;
                         case 2:
@@ -4075,7 +4076,7 @@ void ObjectExplorer::display_data(void* data, void* real_data, std::string type_
                             if (real_data != nullptr) {
                                 auto& int_val = *(int16_t*)real_data;
 
-                                ImGui::DragScalar("Set Value", ImGuiDataType_S16, &int_val, 1.0f, &min_i16, &max_i16);
+                                ImGui::DragScalar(REF_TR("Set Value"), ImGuiDataType_S16, &int_val, 1.0f, &min_i16, &max_i16);
                             }
                             break;
                         case 4:
@@ -4083,7 +4084,7 @@ void ObjectExplorer::display_data(void* data, void* real_data, std::string type_
                             if (real_data != nullptr) {
                                 auto& int_val = *(int32_t*)real_data;
 
-                                ImGui::DragInt("Set Value", (int*)&int_val, 1.0f, min_int, max_int);
+                                ImGui::DragInt(REF_TR("Set Value"), (int*)&int_val, 1.0f, min_int, max_int);
                             }
                             break;
                         case 8:
@@ -4091,17 +4092,17 @@ void ObjectExplorer::display_data(void* data, void* real_data, std::string type_
                             if (real_data != nullptr) {
                                 auto& int_val = *(int64_t*)real_data;
 
-                                ImGui::DragScalar("Set Value", ImGuiDataType_S64, &int_val, 1.0f, &min_int64, &max_int64);
+                                ImGui::DragScalar(REF_TR("Set Value"), ImGuiDataType_S64, &int_val, 1.0f, &min_int64, &max_int64);
                             }
                             break;
                         default:
-                            ImGui::Text("Invalid enum size, falling back to int32");
+                            ImGui::Text(REF_TR("Invalid enum size, falling back to int32"));
 
                             display_enum_value(type_name, *(int32_t*)data);
                             if (real_data != nullptr) {
                                 auto& int_val = *(int32_t*)real_data;
 
-                                ImGui::DragInt("Set Value", (int*)&int_val, 1.0f, min_int, max_int);
+                                ImGui::DragInt(REF_TR("Set Value"), (int*)&int_val, 1.0f, min_int, max_int);
                             }
                             break;
                     }
@@ -4112,7 +4113,7 @@ void ObjectExplorer::display_data(void* data, void* real_data, std::string type_
                     if (real_data != nullptr) {
                         auto& int_val = *(int32_t*)real_data;
 
-                        ImGui::DragInt("Set Value", (int*)&int_val, 1.0f, min_int, max_int);
+                        ImGui::DragInt(REF_TR("Set Value"), (int*)&int_val, 1.0f, min_int, max_int);
                     }
                 }
             } 
@@ -4128,7 +4129,7 @@ void ObjectExplorer::display_data(void* data, void* real_data, std::string type_
                 //    }
                 //};
                 //make_tree_addr(data);
-                if (widget_with_context(data, type_name, [&]() { return ImGui::TreeNode(data, "Variable: 0x%p", data); })) {
+                if (widget_with_context(data, type_name, [&]() { return ImGui::TreeNode(data, REF_TR("Variable: 0x%p"), data); })) {
                     if (is_managed_object(data)) {
                         handle_address(data);
                     }
@@ -4312,25 +4313,25 @@ bool ObjectExplorer::widget_with_context(void* address, const std::string& name,
 
 void ObjectExplorer::context_menu(void* address, std::optional<std::string> name, std::optional<std::function<void()>> additional_context) {
     if (ImGui::BeginPopupContextItem()) {
-        if (ImGui::Selectable("Copy Address")) {
+        if (ImGui::Selectable(REF_TR("Copy Address"))) {
             std::stringstream ss;
             ss << std::hex << (uintptr_t)address;
 
             ImGui::SetClipboardText(ss.str().c_str());
         }
 
-        if (name && ImGui::Selectable("Copy Name")) {
+        if (name && ImGui::Selectable(REF_TR("Copy Name"))) {
             ImGui::SetClipboardText(name->c_str());
         }
 
         const auto is_managed_object = REManagedObject::is_managed_object(address);
 
         if (auto it = std::find_if(m_pinned_objects.begin(), m_pinned_objects.end(), [address](auto& pinned_obj) { return pinned_obj.address == address; }); it != m_pinned_objects.end()) {
-            if (ImGui::Selectable("Unpin")) {
+            if (ImGui::Selectable(REF_TR("Unpin"))) {
                 m_pinned_objects.erase(it);
             }
         } else {
-            if (ImGui::Selectable("Pin")) {
+            if (ImGui::Selectable(REF_TR("Pin"))) {
                 auto& pinned = m_pinned_objects.emplace_back();
 
                 const auto type_definition = is_managed_object ? ((REManagedObject*)address)->get_type_definition() : nullptr;
@@ -4342,7 +4343,7 @@ void ObjectExplorer::context_menu(void* address, std::optional<std::string> name
         }
 
         // Log component hierarchy to disk
-        if (is_managed_object && ((REManagedObject*)address)->is_a("via.Component") && ImGui::Selectable("Log Hierarchy")) {
+        if (is_managed_object && ((REManagedObject*)address)->is_a("via.Component") && ImGui::Selectable(REF_TR("Log Hierarchy"))) {
             auto comp = (REComponent*)address;
 
             for (auto obj = comp; obj; obj = obj->get_child_component()) {
@@ -4364,7 +4365,7 @@ void ObjectExplorer::context_menu(void* address, std::optional<std::string> name
             }
         }
 
-        if (is_managed_object && ImGui::Selectable("Hook All Methods")) {
+        if (is_managed_object && ImGui::Selectable(REF_TR("Hook All Methods"))) {
             const auto t = ((REManagedObject*)address)->get_type_definition();
 
             if (t != nullptr) {
@@ -4488,7 +4489,7 @@ void ObjectExplorer::method_context_menu(sdk::REMethodDefinition* method, std::o
         auto it = std::find_if(m_hooked_methods.begin(), m_hooked_methods.end(), [method](auto& hook) { return hook.method == method; });
 
         if (it == m_hooked_methods.end()) {
-            if (ImGui::Selectable("Hook")) {
+            if (ImGui::Selectable(REF_TR("Hook"))) {
                 std::scoped_lock _{m_job_mutex};
 
                 m_frame_jobs.push_back([this, method, name]() {
@@ -4496,7 +4497,7 @@ void ObjectExplorer::method_context_menu(sdk::REMethodDefinition* method, std::o
                 });
             }
         } else {
-            if (ImGui::Selectable("Unhook")) {
+            if (ImGui::Selectable(REF_TR("Unhook"))) {
                 std::scoped_lock _{m_job_mutex};
 
                 m_frame_jobs.push_back([this, it]() {
@@ -4506,7 +4507,7 @@ void ObjectExplorer::method_context_menu(sdk::REMethodDefinition* method, std::o
             }
         }
 
-        if (ImGui::Selectable("Hook All Methods")) {
+        if (ImGui::Selectable(REF_TR("Hook All Methods"))) {
             const auto declaring_type = method->get_declaring_type();
 
             if (declaring_type != nullptr) {
@@ -4518,7 +4519,7 @@ void ObjectExplorer::method_context_menu(sdk::REMethodDefinition* method, std::o
             }
         }
 
-        if (ImGui::Selectable("Unhook All Methods")) {
+        if (ImGui::Selectable(REF_TR("Unhook All Methods"))) {
             const auto declaring_type = method->get_declaring_type();
 
             if (declaring_type != nullptr) {
@@ -4533,7 +4534,7 @@ void ObjectExplorer::method_context_menu(sdk::REMethodDefinition* method, std::o
         // Allow us to call really simple methods with no params
         if (method->get_param_types().size() == 0) {
             if (obj != nullptr || method->is_static()) {
-                if (ImGui::Selectable("Call")) {
+                if (ImGui::Selectable(REF_TR("Call"))) {
                     method->invoke(obj, {});
                 }
             }

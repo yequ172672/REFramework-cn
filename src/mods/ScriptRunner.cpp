@@ -16,6 +16,7 @@
 #include "utility/String.hpp"
 #include "utility/PersistentTreeState.hpp"
 #include <utility/ScopeGuard.hpp>
+#include "../utility/Localization.hpp"
 
 #include "Mods.hpp"
 
@@ -1174,11 +1175,11 @@ void ScriptRunner::on_draw_ui() {
 
     if (ImGui::CollapsingHeader(get_name().data())) {
         if (m_last_online_match_state) {
-            ImGui::TextWrapped("Online match detected. Scripts will not be loaded. Existing scripts have been unloaded.");
+            ImGui::TextWrapped(REF_TR("Online match detected. Scripts will not be loaded. Existing scripts have been unloaded."));
             return;
         }
 
-        if (ImGui::Button("Run script")) {
+        if (ImGui::Button(REF_TR("Run script"))) {
             OPENFILENAME ofn{};
             char file[260]{};
 
@@ -1198,69 +1199,69 @@ void ScriptRunner::on_draw_ui() {
 
         ImGui::SameLine();
 
-        if (ImGui::Button("Reset scripts")) {
+        if (ImGui::Button(REF_TR("Reset scripts"))) {
             reset_scripts();
         }
 
         ImGui::SameLine();
 
-        if (ImGui::Button("Spawn Debug Console")) {
+        if (ImGui::Button(REF_TR("Spawn Debug Console"))) {
             g_framework->open_console();
         }
 
-        if (m_open_debug_console_at_startup->draw("Open Debug Console at Startup")) {
+        if (m_open_debug_console_at_startup->draw(REF_TR("Open Debug Console at Startup"))) {
             g_framework->request_save_config();
         }
 
         //Garbage collection currently only showing from main lua state, might rework to show total later?
-        if (ImGui::TreeNode("Garbage Collection Stats")) {
+        if (ImGui::TreeNode(REF_TR("Garbage Collection Stats"))) {
             std::scoped_lock _{ m_access_mutex };
 
             auto g = G(m_main_state->lua().lua_state());
             const auto bytes_in_use = g->totalbytes + g->GCdebt;
 
-            ImGui::Text("Megabytes in use: %.2f", (float)bytes_in_use / 1024.0f / 1024.0f);
+            ImGui::Text(REF_TR("Megabytes in use: %.2f"), (float)bytes_in_use / 1024.0f / 1024.0f);
 
             ImGui::TreePop();
         }
 
-        if (m_gc_handler->draw("Garbage Collection Handler")) {
+        if (m_gc_handler->draw(REF_TR("Garbage Collection Handler"))) {
             std::scoped_lock _{ m_access_mutex };
             m_main_state->gc_data_changed(make_gc_data());
         }
 
-        if (m_gc_mode->draw("Garbage Collection Mode")) {
+        if (m_gc_mode->draw(REF_TR("Garbage Collection Mode"))) {
             std::scoped_lock _{ m_access_mutex };
             m_main_state->gc_data_changed(make_gc_data());
         }
 
         if ((uint32_t)m_gc_mode->value() == (uint32_t)ScriptState::GarbageCollectionMode::GENERATIONAL) {
-            if (m_gc_minor_multiplier->draw("Minor GC Multiplier")) {
+            if (m_gc_minor_multiplier->draw(REF_TR("Minor GC Multiplier"))) {
                 std::scoped_lock _{ m_access_mutex };
                 m_main_state->gc_data_changed(make_gc_data());
             }
 
-            if (m_gc_major_multiplier->draw("Major GC Multiplier")) {
+            if (m_gc_major_multiplier->draw(REF_TR("Major GC Multiplier"))) {
                 std::scoped_lock _{ m_access_mutex };
                 m_main_state->gc_data_changed(make_gc_data());
             }
         }
 
         if (m_gc_handler->value() == (int32_t)ScriptState::GarbageCollectionHandler::REFRAMEWORK_MANAGED) {
-            if (m_gc_type->draw("Garbage Collection Type")) {
+            if (m_gc_type->draw(REF_TR("Garbage Collection Type"))) {
                 std::scoped_lock _{ m_access_mutex };
                 m_main_state->gc_data_changed(make_gc_data());
             }
 
             if ((uint32_t)m_gc_mode->value() != (uint32_t)ScriptState::GarbageCollectionMode::GENERATIONAL) {
-                if (m_gc_budget->draw("Garbage Collection Budget")) {
+                if (m_gc_budget->draw(REF_TR("Garbage Collection Budget"))) {
                     std::scoped_lock _{ m_access_mutex };
                     m_main_state->gc_data_changed(make_gc_data());
                 }
             }
         }
 
-        m_log_to_disk->draw("Log Lua Errors to Disk");
+        m_log_to_disk->draw(REF_TR("Log Lua Errors to Disk"));
 
         if (!m_last_script_error.empty()) {
             std::shared_lock _{m_script_error_mutex};
@@ -1269,17 +1270,17 @@ void ScriptRunner::on_draw_ui() {
             const auto diff = now - m_last_script_error_time;
             const auto sec = std::chrono::duration<float>(diff).count();
 
-            ImGui::TextWrapped("Last Error Time: %.2f seconds ago", sec);
+            ImGui::TextWrapped(REF_TR("Last Error Time: %.2f seconds ago"), sec);
 
             ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.0f, 0.0f, 1.0f));
-            ImGui::TextWrapped("Last Script Error: %s", m_last_script_error.data());
+            ImGui::TextWrapped(REF_TR("Last Script Error: %s"), m_last_script_error.data());
             ImGui::PopStyleColor();
         } else {
-            ImGui::TextWrapped("No Script Errors... yet!");
+            ImGui::TextWrapped(REF_TR("No Script Errors... yet!"));
         }
 
         if (!m_known_scripts.empty()) {
-            ImGui::Text("Known scripts:");
+            ImGui::Text(REF_TR("Known scripts:"));
 
             for (auto&& name : m_known_scripts) {
                 if (ImGui::Checkbox(name.data(), &m_loaded_scripts_map[name])) {
@@ -1288,7 +1289,7 @@ void ScriptRunner::on_draw_ui() {
                 }
             }
         } else {
-            ImGui::Text("No scripts loaded.");
+            ImGui::Text(REF_TR("No scripts loaded."));
         }
     }
 
@@ -1300,7 +1301,7 @@ void ScriptRunner::on_draw_ui() {
         if (reframework::ui::persistent_tree_item(
                 reframework::ui::TreeStateSource::Native,
                 "Script Generated UI",
-                []() { return ImGui::CollapsingHeader("Script Generated UI"); })) {
+                []() { return ImGui::CollapsingHeader(REF_TR("Script Generated UI")); })) {
             if (scripts_initialized) {
                 for (auto& state : m_states) {
                     state->on_draw_ui();

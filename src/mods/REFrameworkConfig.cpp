@@ -1,4 +1,5 @@
 #include "../REFramework.hpp"
+#include "../utility/Localization.hpp"
 
 #include "REFrameworkConfig.hpp"
 
@@ -11,6 +12,10 @@ std::optional<std::string> REFrameworkConfig::on_initialize() {
     namespace fs = std::filesystem;
     fonts.clear();
     fonts.push_back("DEFAULT");
+
+    utility::localization::initialize();
+    utility::localization::load_language_files(
+        REFramework::get_persistent_dir() / "reframework" / "languages");
 
     const auto fonts_path = REFramework::get_persistent_dir() / "reframework" / "fonts";
     fs::create_directories(fonts_path);
@@ -34,7 +39,7 @@ std::optional<std::string> REFrameworkConfig::on_initialize() {
 }
 
 void REFrameworkConfig::on_draw_ui() {
-    if (!ImGui::CollapsingHeader("Configuration")) {
+    if (!ImGui::CollapsingHeader(REF_TR("Configuration"))) {
         return;
     }
 
@@ -42,17 +47,23 @@ void REFrameworkConfig::on_draw_ui() {
 
     bool changed = false;
 
-    changed |= m_menu_key->draw("Menu Key");
-    changed |= m_show_cursor_key->draw("Show Cursor Key");
-    changed |= m_remember_menu_state->draw("Remember Menu Open/Closed State");
-    changed |= m_always_show_cursor->draw("Draw Cursor With Menu Open");
+    if (m_language->draw(REF_TR("Language"))) {
+        utility::localization::set_language(
+            utility::localization::language_from_name(m_language->value()));
+        changed = true;
+    }
 
-    if (m_font_file->draw("Font")) {
+    changed |= m_menu_key->draw(REF_TR("Menu Key"));
+    changed |= m_show_cursor_key->draw(REF_TR("Show Cursor Key"));
+    changed |= m_remember_menu_state->draw(REF_TR("Remember Menu Open/Closed State"));
+    changed |= m_always_show_cursor->draw(REF_TR("Draw Cursor With Menu Open"));
+
+    if (m_font_file->draw(REF_TR("Font"))) {
         g_framework->set_font(m_font_file->value());
         changed = true;
     }
 
-    if (m_font_size->draw("Font Size")) {
+    if (m_font_size->draw(REF_TR("Font Size"))) {
         g_framework->set_font_size(m_font_size->value());
 
         const auto display_size = g_framework->get_main_window_display_size();
@@ -83,6 +94,9 @@ void REFrameworkConfig::on_config_load(const utility::Config& cfg) {
     for (IModValue& option : m_options) {
         option.config_load(cfg);
     }
+
+    utility::localization::set_language(
+        utility::localization::language_from_name(m_language->value()));
 
     if (m_remember_menu_state->value()) {
         g_framework->set_draw_ui(m_menu_open->value(), false);

@@ -29,6 +29,7 @@ extern "C" {
 #include "re2-imgui/imgui_impl_dx12.h"
 #include "re2-imgui/imgui_impl_win32.h"
 
+#include "utility/Localization.hpp"
 #include "utility/Module.hpp"
 #include "utility/Patch.hpp"
 #include "utility/PersistentTreeState.hpp"
@@ -1948,17 +1949,17 @@ void REFramework::draw_ui() {
     bool is_open = true;
     ImGui::Begin(REF_NAME.c_str(), &is_open);
     const auto* main_window = ImGui::GetCurrentWindow();
-    ImGui::Text("Default Menu Key: Insert");
-    ImGui::Checkbox("Transparency", &m_ui_option_transparent);
+    ImGui::Text(REF_TR("Default Menu Key: Insert"));
+    ImGui::Checkbox(REF_TR("Transparency"), &m_ui_option_transparent);
     ImGui::SameLine();
     ImGui::Text("(?)");
     if (ImGui::IsItemHovered())
-        ImGui::SetTooltip("Makes the UI transparent when not focused.");
-    ImGui::Checkbox("Input Passthrough", &m_ui_passthrough);
+        ImGui::SetTooltip(REF_TR("Makes the UI transparent when not focused."));
+    ImGui::Checkbox(REF_TR("Input Passthrough"), &m_ui_passthrough);
     ImGui::SameLine();
     ImGui::Text("(?)");
     if (ImGui::IsItemHovered())
-        ImGui::SetTooltip("Allows mouse and keyboard inputs to register to the game while the UI is focused.");
+        ImGui::SetTooltip(REF_TR("Allows mouse and keyboard inputs to register to the game while the UI is focused."));
 
     // Mods:
     draw_about();
@@ -1966,10 +1967,10 @@ void REFramework::draw_ui() {
     if (m_error.empty() && m_game_data_initialized) {
         m_mods->on_draw_ui();
     } else if (!m_game_data_initialized) {
-        ImGui::TextWrapped("REFramework is currently initializing...");
-        ImGui::TextWrapped("This menu will close after initialization if you have the remember option enabled.");
+        ImGui::TextWrapped(REF_TR("REFramework is currently initializing..."));
+        ImGui::TextWrapped(REF_TR("This menu will close after initialization if you have the remember option enabled."));
     } else if (!m_error.empty()) {
-        ImGui::TextWrapped("REFramework error: %s", m_error.c_str());
+        ImGui::TextWrapped(REF_TR("REFramework error: %s"), m_error.c_str());
     }
 
     m_last_window_pos = main_window->Pos;
@@ -1994,27 +1995,27 @@ void REFramework::draw_ui() {
 }
 
 void REFramework::draw_about() {
-    if (!ImGui::CollapsingHeader("About")) {
+    if (!ImGui::CollapsingHeader(REF_TR("About"))) {
         return;
     }
 
     ImGui::TreePush("About");
 
-    ImGui::Text("Author: praydog");
-    ImGui::Text("Inspired by the Kanan project.");
+    ImGui::Text(REF_TR("Author: praydog"));
+    ImGui::Text(REF_TR("Inspired by the Kanan project."));
     ImGui::Text("https://github.com/praydog/REFramework");
     ImGui::Text("http://praydog.com");
-    ImGui::Text("Branch: %s", REF_BRANCH);
-    ImGui::Text("Commits: %i", REF_TOTAL_COMMITS);
-    ImGui::Text("Commit hash: %s", std::format("{:.8}", REF_COMMIT_HASH).c_str());
-    ImGui::Text("Tag: %s", REF_TAG);
+    ImGui::Text(REF_TR("Branch: %s"), REF_BRANCH);
+    ImGui::Text(REF_TR("Commits: %i"), REF_TOTAL_COMMITS);
+    ImGui::Text(REF_TR("Commit hash: %s"), std::format("{:.8}", REF_COMMIT_HASH).c_str());
+    ImGui::Text(REF_TR("Tag: %s"), REF_TAG);
 #ifdef REF_COMMITS_PAST_TAG
-    ImGui::Text("Commits past tag: %i", REF_COMMITS_PAST_TAG);
+    ImGui::Text(REF_TR("Commits past tag: %i"), REF_COMMITS_PAST_TAG);
 #endif
-    ImGui::Text("Build date: %s", REF_BUILD_DATE);
-    ImGui::Text("Build time: %s", REF_BUILD_TIME);
+    ImGui::Text(REF_TR("Build date: %s"), REF_BUILD_DATE);
+    ImGui::Text(REF_TR("Build time: %s"), REF_BUILD_TIME);
 
-    if (ImGui::TreeNode("Licenses")) {
+    if (ImGui::TreeNode(REF_TR("Licenses"))) {
         struct License {
             std::string name;
             std::string text;
@@ -2081,15 +2082,15 @@ void REFramework::draw_about() {
                 }
             }
 
-            ImGui::Text("Engine information");
-            ImGui::Text(" Config: %s", engine_config.c_str());
-            ImGui::Text(" Version: %s", clean_version.c_str());
-            ImGui::Text(" TDB Version: %i", tdb_version);
+            ImGui::Text(REF_TR("Engine information"));
+            ImGui::Text(REF_TR(" Config: %s"), engine_config.c_str());
+            ImGui::Text(REF_TR(" Version: %s"), clean_version.c_str());
+            ImGui::Text(REF_TR(" TDB Version: %i"), tdb_version);
         } catch(...) {
-            ImGui::Text("Unable to determine engine version.");
+            ImGui::Text(REF_TR("Unable to determine engine version."));
         }
     } else {
-        ImGui::Text("Unable to determine engine version.");
+        ImGui::Text(REF_TR("Unable to determine engine version."));
     }
 
     ImGui::TreePop();

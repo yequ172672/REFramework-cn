@@ -1535,6 +1535,8 @@ if(REF_BUILD_FRAMEWORK AND CMAKE_SIZEOF_VOID_P EQUAL 8) # build-framework
 		"src/re2-imgui/re2_imconfig.hpp"
 		"src/utility/ImGui.cpp"
 		"src/utility/ImGui.hpp"
+		"src/utility/Localization.cpp"
+		"src/utility/Localization.hpp"
 		"src/utility/PersistentTreeState.hpp"
 		"src/utility/SafeCallbackVector.hpp"
 	)

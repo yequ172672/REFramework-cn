@@ -15,6 +15,8 @@
 #include "sdk/REGameObject.hpp"
 #include <sdk/GameIdentity.hpp>
 
+#include "../../utility/Localization.hpp"
+
 // Chain struct includes. CollisionData offset differs:
 //   TDB < 71 (RE2/RE3/DMC5): 0x58
 //   TDB >= 71 (MHRise/SF6/DD2/etc): 0x60
@@ -160,11 +162,11 @@ void ChainViewer::on_draw_dev_ui() {
         return;
     }
 
-    if (m_enabled->draw("Enabled") && !m_enabled->value()) {
+    if (m_enabled->draw(REF_TR("Enabled")) && !m_enabled->value()) {
         // todo
     }
 
-    if (ImGui::SliderFloat("Effect Alpha", &m_effect_alpha, 0.0f, 1.0f)) {
+    if (ImGui::SliderFloat(REF_TR("Effect Alpha"), &m_effect_alpha, 0.0f, 1.0f)) {
         m_effect_dirty = true;
     }
 }
@@ -274,7 +276,7 @@ void ChainViewer::on_frame() {
     IMGUIZMO_NAMESPACE::SetDrawlist(ImGui::GetBackgroundDrawList());
     IMGUIZMO_NAMESPACE::SetRect(0, 0, ImGui::GetIO().DisplaySize.x, ImGui::GetIO().DisplaySize.y);
 
-    ImGui::Begin("Chains");
+    ImGui::Begin(REF_TR("Chains"));
 
     static auto chain_type = sdk::find_type_definition("via.motion.Chain");
     static auto chain_runtime_type = chain_type->get_runtime_type();
@@ -475,10 +477,10 @@ void ChainViewer::on_frame() {
                         ImGui::SetNextItemOpen(true, ImGuiCond_::ImGuiCond_Once);
 
                     const bool tree_open = has_collision_top
-                        ? ImGui::TreeNode((void*)collider.addr, "Collision %d %d", i, j)
-                        : ImGui::TreeNode((void*)collider.addr, "Collision %d", i);
+                        ? ImGui::TreeNode((void*)collider.addr, REF_TR("Collision %d %d"), i, j)
+                        : ImGui::TreeNode((void*)collider.addr, REF_TR("Collision %d"), i);
                     if (tree_open) {
-                            auto made_joint_node = ImGui::TreeNode((void*)(collider.addr + 0x100), "Joint");
+                            auto made_joint_node = ImGui::TreeNode((void*)(collider.addr + 0x100), REF_TR("Joint"));
 
                             const auto col = ImVec4{100.0f / 255.0f, 149.0f / 255.0f, 237.0f / 255.0f, 255 / 255.0f};
 
@@ -492,7 +494,7 @@ void ChainViewer::on_frame() {
                                 ImGui::TreePop();
                             }
 
-                            made_joint_node = ImGui::TreeNode((void*)(collider.addr + 0x108), "Pair Joint");
+                            made_joint_node = ImGui::TreeNode((void*)(collider.addr + 0x108), REF_TR("Pair Joint"));
 
                             if (collider.pair_joint() != nullptr) {
                                 ImGui::SameLine();

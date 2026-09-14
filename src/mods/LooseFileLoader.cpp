@@ -2,6 +2,7 @@
 #include <sdk/RETypeDB.hpp>
 #include <utility/Scan.hpp>
 #include <utility/Module.hpp>
+#include "../utility/Localization.hpp"
 #include "REFramework.hpp"
 
 #include <spdlog/sinks/basic_file_sink.h>
@@ -69,7 +70,7 @@ void LooseFileLoader::on_draw_ui() {
     }
 
     if (m_attempted_hook && !m_hook_success) {
-        ImGui::TextWrapped("Failed to hook successfully. This mod will not work.");
+        ImGui::TextWrapped(REF_TR("Failed to hook successfully. This mod will not work."));
         return;
     }
 
@@ -81,16 +82,16 @@ void LooseFileLoader::on_draw_ui() {
         m_uncached_hits = 0;
     };
 
-    if (m_enabled->draw("Enable Loose File Loader")) {
+    if (m_enabled->draw(REF_TR("Enable Loose File Loader"))) {
         clear_existence_cache();
         g_framework->request_save_config();
     }
 
     if (m_hook_success) {
-        ImGui::TextWrapped("Files encountered: %d", m_files_encountered);
-        ImGui::TextWrapped("Loose files loaded: %d", m_loose_files_loaded);
+        ImGui::TextWrapped(REF_TR("Files encountered: %d"), m_files_encountered);
+        ImGui::TextWrapped(REF_TR("Loose files loaded: %d"), m_loose_files_loaded);
 
-        if (ImGui::Button("Clear stats")) {
+        if (ImGui::Button(REF_TR("Clear stats"))) {
             m_files_encountered = 0;
             m_loose_files_loaded = 0;
 
@@ -101,38 +102,38 @@ void LooseFileLoader::on_draw_ui() {
             m_all_loose_files.clear();
         }
 
-        if (ImGui::TreeNode("Debug")) {
-            ImGui::Checkbox("Enable file cache", &m_enable_file_cache);
-            ImGui::TextWrapped("Cache hits: %d", m_cache_hits);
-            ImGui::TextWrapped("Uncached hits: %d", m_uncached_hits);
+        if (ImGui::TreeNode(REF_TR("Debug"))) {
+            ImGui::Checkbox(REF_TR("Enable file cache"), &m_enable_file_cache);
+            ImGui::TextWrapped(REF_TR("Cache hits: %d"), m_cache_hits);
+            ImGui::TextWrapped(REF_TR("Uncached hits: %d"), m_uncached_hits);
 
-            if (ImGui::Button("Clear existence cache")) {
+            if (ImGui::Button(REF_TR("Clear existence cache"))) {
                 clear_existence_cache();
             }
 
             ImGui::TreePop();
         }
 
-        m_log_accessed_files->draw("Log accessed files");
+        m_log_accessed_files->draw(REF_TR("Log accessed files"));
         if (ImGui::IsItemHovered()) {
             ImGui::BeginTooltip();
-            ImGui::Text("Logs all accessed files to <game_dir>/reframework_accessed_files.txt");
+            ImGui::Text(REF_TR("Logs all accessed files to <game_dir>/reframework_accessed_files.txt"));
             ImGui::EndTooltip();
         }
 
-        m_log_loose_files->draw("Log loose files");
+        m_log_loose_files->draw(REF_TR("Log loose files"));
         if (ImGui::IsItemHovered()) {
             ImGui::BeginTooltip();
-            ImGui::Text("Logs loaded loose files to <game_dir>/reframework_loose_files.txt");
+            ImGui::Text(REF_TR("Logs loaded loose files to <game_dir>/reframework_loose_files.txt"));
             ImGui::EndTooltip();
         }
 
-        ImGui::Checkbox("Show recent files", &m_show_recent_files);
+        ImGui::Checkbox(REF_TR("Show recent files"), &m_show_recent_files);
 
         if (m_show_recent_files) {
             std::shared_lock _{m_mutex};
 
-            if (ImGui::TreeNode("Recent accessed files")) {
+            if (ImGui::TreeNode(REF_TR("Recent accessed files"))) {
                 for (const auto& file : m_recent_accessed_files) {
                     ImGui::TextWrapped("%s", utility::narrow(file).c_str());
                 }
@@ -140,7 +141,7 @@ void LooseFileLoader::on_draw_ui() {
                 ImGui::TreePop();
             }
 
-            if (ImGui::TreeNode("Recent loose files")) {
+            if (ImGui::TreeNode(REF_TR("Recent loose files"))) {
                 for (const auto& file : m_recent_loose_files) {
                     ImGui::TextWrapped("%s", utility::narrow(file).c_str());
                 }

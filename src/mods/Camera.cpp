@@ -2,6 +2,8 @@
 #include <sdk/RETypeDB.hpp>
 #include <sdk/GameIdentity.hpp>
 
+#include "../utility/Localization.hpp"
+
 #include "Camera.hpp"
 
 using namespace utility;
@@ -24,31 +26,31 @@ void Camera::on_draw_ui() {
         return;
     }
 
-    ImGui::TextWrapped("Make sure to tick \"Enabled\" for any of the below settings to take effect.");
+    ImGui::TextWrapped(REF_TR("Make sure to tick \"Enabled\" for any of the below settings to take effect."));
 
-    if (m_enabled->draw("Enabled") && !m_enabled->value()) {
+    if (m_enabled->draw(REF_TR("Enabled")) && !m_enabled->value()) {
         on_disabled();
     }
 
-    if (m_disable_vignette->draw("Disable Vignette") && !m_disable_vignette->value()) {
+    if (m_disable_vignette->draw(REF_TR("Disable Vignette")) && !m_disable_vignette->value()) {
         set_vignette_type(via::render::ToneMapping::Vignetting::Enable);
     }
 
     // RE8 and above have vignetting brightness
     if (sdk::GameIdentity::get().tdb_ver() >= 69) {
-        m_vignette_brightness->draw("Vignette Brightness");
+        m_vignette_brightness->draw(REF_TR("Vignette Brightness"));
     }
 
     if (sdk::GameIdentity::get().is_re8()) {
-        m_fov->draw("RE8 FOV");
-        m_fov_aiming->draw("RE8 Aiming FOV");
+        m_fov->draw(REF_TR("RE8 FOV"));
+        m_fov_aiming->draw(REF_TR("RE8 Aiming FOV"));
     }
 
     ImGui::Separator();
-    ImGui::TextWrapped("These below settings are separate and do not require \"Enabled\" to be ticked.");
+    ImGui::TextWrapped(REF_TR("These below settings are separate and do not require \"Enabled\" to be ticked."));
 
-    m_use_custom_global_fov->draw("Use Custom Global FOV");
-    m_global_fov->draw("Global FOV");
+    m_use_custom_global_fov->draw(REF_TR("Use Custom Global FOV"));
+    m_global_fov->draw(REF_TR("Global FOV"));
 }
 
 void Camera::on_update_transform(RETransform* transform) {

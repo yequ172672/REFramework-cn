@@ -6,6 +6,7 @@
 #include <utility/Memory.hpp>
 
 #include <sdk/GameIdentity.hpp>
+#include "../utility/Localization.hpp"
 #include "sdk/GUIPrimitiveSystem.hpp"
 #include "sdk/Application.hpp"
 
@@ -48,17 +49,17 @@ std::optional<std::string> Hooks::on_initialize() {
 }
 
 void Hooks::on_draw_ui() {
-    if (!ImGui::CollapsingHeader("Performance")) {
+    if (!ImGui::CollapsingHeader(REF_TR("Performance"))) {
         return;
     }
 
-    ImGui::Checkbox("Enable Profiling", &m_profiling_enabled);
+    ImGui::Checkbox(REF_TR("Enable Profiling"), &m_profiling_enabled);
 
     if (!m_profiling_enabled) {
         return;
     }
 
-    ImGui::Text("Application Entry Times");
+    ImGui::Text(REF_TR("Application Entry Times"));
 
     std::vector<const char*> sorted_times{};
     std::scoped_lock _{m_profiler_mutex};
@@ -80,8 +81,8 @@ void Hooks::on_draw_ui() {
                 > b_entry.callback_time + b_entry.reframework_pre_time + b_entry.reframework_post_time;
     });
 
-    ImGui::Text("Total REFramework Time: %.3fms", std::chrono::duration_cast<std::chrono::duration<float, std::milli>>(total_reframework_time).count());
-    ImGui::Text("Total Game Time: %.3fms", std::chrono::duration_cast<std::chrono::duration<float, std::milli>>(total_game_time).count());
+    ImGui::Text(REF_TR("Total REFramework Time: %.3fms"), std::chrono::duration_cast<std::chrono::duration<float, std::milli>>(total_reframework_time).count());
+    ImGui::Text(REF_TR("Total Game Time: %.3fms"), std::chrono::duration_cast<std::chrono::duration<float, std::milli>>(total_game_time).count());
 
     for (auto name : sorted_times) {
         auto& entry = m_application_entry_times[name];
@@ -89,10 +90,10 @@ void Hooks::on_draw_ui() {
         ImGui::SetNextItemOpen(true);
 
         if (ImGui::TreeNode(name)) {
-            ImGui::Text("Game Time: %s: %.2fms", name, entry.callback_time.count() / 1000000.0f);
-            ImGui::Text("REFramework Pre Time: %.2fms", entry.reframework_pre_time.count() / 1000000.0f);
-            ImGui::Text("REFramework Post Time: %.2fms", entry.reframework_post_time.count() / 1000000.0f);
-            ImGui::Text("Total Time: %.2fms", (entry.callback_time + entry.reframework_pre_time + entry.reframework_post_time).count() / 1000000.0f);
+            ImGui::Text(REF_TR("Game Time: %s: %.2fms"), name, entry.callback_time.count() / 1000000.0f);
+            ImGui::Text(REF_TR("REFramework Pre Time: %.2fms"), entry.reframework_pre_time.count() / 1000000.0f);
+            ImGui::Text(REF_TR("REFramework Post Time: %.2fms"), entry.reframework_post_time.count() / 1000000.0f);
+            ImGui::Text(REF_TR("Total Time: %.2fms"), (entry.callback_time + entry.reframework_pre_time + entry.reframework_post_time).count() / 1000000.0f);
             
             ImGui::TreePop();
         }

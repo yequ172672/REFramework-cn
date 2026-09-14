@@ -7,6 +7,7 @@
 #include "reframework/API.hpp"
 #include "utility/String.hpp"
 #include "utility/Module.hpp"
+#include "../utility/Localization.hpp"
 
 #include "sdk/ResourceManager.hpp"
 #include "sdk/Memory.hpp"
@@ -822,18 +823,18 @@ void PluginLoader::on_draw_ui() {
         std::scoped_lock _{m_mux};
 
         if (!m_plugins.empty()) {
-            ImGui::Text("Loaded plugins:");
+            ImGui::Text(REF_TR("Loaded plugins:"));
 
             for (auto&& [name, _] : m_plugins) {
                 ImGui::Text(name.c_str());
             }
         } else {
-            ImGui::Text("No plugins loaded.");
+            ImGui::Text(REF_TR("No plugins loaded."));
         }
 
         if (!m_plugin_load_errors.empty()) {
             ImGui::Spacing();
-            ImGui::Text("Errors:");
+            ImGui::Text(REF_TR("Errors:"));
             for (auto&& [name, error] : m_plugin_load_errors) {
                 ImGui::Text("%s - %s", name.c_str(), error.c_str());
             }
@@ -841,7 +842,7 @@ void PluginLoader::on_draw_ui() {
 
         if (!m_plugin_load_warnings.empty()) {
             ImGui::Spacing();
-            ImGui::Text("Warnings:");
+            ImGui::Text(REF_TR("Warnings:"));
             for (auto&& [name, warning] : m_plugin_load_warnings) {
                 ImGui::Text("%s - %s", name.c_str(), warning.c_str());
             }
