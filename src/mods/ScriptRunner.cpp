@@ -1173,7 +1173,7 @@ void ScriptRunner::on_frame() {
 void ScriptRunner::on_draw_ui() {
     ImGui::SetNextItemOpen(false, ImGuiCond_::ImGuiCond_Once);
 
-    if (ImGui::CollapsingHeader(get_name().data())) {
+    if (ImGui::CollapsingHeader(REF_TR(get_name().data()))) {
         if (m_last_online_match_state) {
             ImGui::TextWrapped(REF_TR("Online match detected. Scripts will not be loaded. Existing scripts have been unloaded."));
             return;

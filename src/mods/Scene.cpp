@@ -59,7 +59,7 @@ void SceneMods::on_frame() {
 void SceneMods::on_draw_ui() {
     ImGui::SetNextItemOpen(false, ImGuiCond_::ImGuiCond_FirstUseEver);
 
-    if (!ImGui::CollapsingHeader(get_name().data())) {
+    if (!ImGui::CollapsingHeader(REF_TR(get_name().data()))) {
         return;
     }
 

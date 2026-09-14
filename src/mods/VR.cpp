@@ -3689,7 +3689,7 @@ void VR::on_draw_ui() {
         }
     }
 
-    if (!ImGui::CollapsingHeader(get_name().data())) {
+    if (!ImGui::CollapsingHeader(REF_TR(get_name().data()))) {
         return;
     }
 

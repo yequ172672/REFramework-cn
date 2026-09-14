@@ -2,6 +2,8 @@
 #include "tools/ChainViewer.hpp"
 #include "tools/ObjectExplorer.hpp"
 
+#include "utility/Localization.hpp"
+
 #include "DeveloperTools.hpp"
 
 DeveloperTools::DeveloperTools() {
@@ -14,7 +16,7 @@ DeveloperTools::DeveloperTools() {
 }
 
 void DeveloperTools::on_draw_ui() {
-    if (!ImGui::CollapsingHeader(get_name().data())) {
+    if (!ImGui::CollapsingHeader(REF_TR(get_name().data()))) {
         return;
     }
 

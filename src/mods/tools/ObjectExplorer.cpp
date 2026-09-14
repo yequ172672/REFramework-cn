@@ -368,7 +368,7 @@ void ObjectExplorer::on_draw_dev_ui() {
         m_do_init = false;
     }
 
-    if (!m_do_init && !ImGui::CollapsingHeader(get_name().data())) {
+    if (!m_do_init && !ImGui::CollapsingHeader(REF_TR(get_name().data()))) {
         return;
     }
     if (ImGui::Button(REF_TR("Dump SDK"))) {

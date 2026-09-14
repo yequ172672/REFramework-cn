@@ -819,7 +819,7 @@ std::optional<std::string> PluginLoader::initialize_plugins() {
 void PluginLoader::on_draw_ui() {
     ImGui::SetNextItemOpen(false, ImGuiCond_Once);
 
-    if (ImGui::CollapsingHeader(get_name().data())) {
+    if (ImGui::CollapsingHeader(REF_TR(get_name().data()))) {
         std::scoped_lock _{m_mux};
 
         if (!m_plugins.empty()) {
