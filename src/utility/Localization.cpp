@@ -1,5 +1,10 @@
 #include "Localization.hpp"
 
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#include <windows.h>
+
 #include <spdlog/spdlog.h>
 
 #include <json.hpp>
@@ -26,7 +31,8 @@ TranslationTable& english_table() {
     return table;
 }
 
-Language g_language{ Language::SimplifiedChinese };
+Language g_language_setting{ Language::Auto };
+Language g_resolved_language{ Language::SimplifiedChinese };
 bool g_initialized{ false };
 
 void add(TranslationTable& table, const char* key, const char* value) {
@@ -36,7 +42,7 @@ void add(TranslationTable& table, const char* key, const char* value) {
 }
 
 const TranslationTable& active_table() {
-    return g_language == Language::English ? english_table() : chinese_table();
+    return g_resolved_language == Language::English ? english_table() : chinese_table();
 }
 
 void load_table_from_file(const fs::path& file, TranslationTable& table) {
@@ -585,7 +591,8 @@ void initialize() {
     }
 
     g_initialized = true;
-    g_language = Language::SimplifiedChinese;
+    g_language_setting = Language::Auto;
+    g_resolved_language = detect_system_language();
 
     add_builtin_chinese();
 
@@ -606,18 +613,30 @@ void load_language_files(const fs::path& languages_dir) {
 }
 
 Language get_language() {
-    return g_language;
+    return g_language_setting;
 }
 
 void set_language(Language language) {
-    g_language = language;
+    g_language_setting = language;
+    g_resolved_language = language == Language::Auto ? detect_system_language() : language;
+
     spdlog::info("Localization: language set to {} ({})", get_language_name(language), get_language_code(language));
+}
+
+Language detect_system_language() {
+    if (PRIMARYLANGID(GetUserDefaultUILanguage()) == LANG_CHINESE) {
+        return Language::SimplifiedChinese;
+    }
+
+    return Language::English;
 }
 
 const char* get_language_code(Language language) {
     switch (language) {
     case Language::English:
         return "en";
+    case Language::Auto:
+        return "auto";
     case Language::SimplifiedChinese:
     default:
         return "zh-CN";
@@ -628,6 +647,8 @@ const char* get_language_name(Language language) {
     switch (language) {
     case Language::English:
         return "English";
+    case Language::Auto:
+        return "Auto (System)";
     case Language::SimplifiedChinese:
     default:
         return "简体中文";
@@ -635,6 +656,10 @@ const char* get_language_name(Language language) {
 }
 
 Language language_from_name(std::string_view name, Language fallback) {
+    if (name == "Auto (System)" || name == "Auto" || name == "auto") {
+        return Language::Auto;
+    }
+
     if (name == "English" || name == "en" || name == "en-US") {
         return Language::English;
     }
@@ -662,7 +687,8 @@ const char* tr(const char* text) {
 }
 
 std::string translate(std::string_view text, Language language) {
-    const auto& table = language == Language::English ? english_table() : chinese_table();
+    const auto resolved = language == Language::Auto ? detect_system_language() : language;
+    const auto& table = resolved == Language::English ? english_table() : chinese_table();
     const auto it = table.find(std::string{ text });
 
     if (it != table.end()) {

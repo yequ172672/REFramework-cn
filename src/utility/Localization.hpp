@@ -17,6 +17,9 @@ namespace utility::localization {
 enum class Language : int32_t {
     SimplifiedChinese = 0,
     English = 1,
+    // Follows the operating system UI language: Chinese systems get Simplified
+    // Chinese, every other language gets English.
+    Auto = 2,
 };
 
 // Registers the built-in translation tables. Idempotent.
@@ -29,6 +32,10 @@ void load_language_files(const std::filesystem::path& languages_dir);
 
 Language get_language();
 void set_language(Language language);
+
+// Language implied by the operating system UI language. Chinese systems map to
+// Simplified Chinese, all other systems map to English.
+Language detect_system_language();
 
 // Stable identifier used for external language files, e.g. "zh-CN" or "en".
 const char* get_language_code(Language language);

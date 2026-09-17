@@ -60,7 +60,7 @@ private:
     ModFloat::Ptr m_ui_font_size{ModFloat::create(UI_FONT_SIZE_CONFIG_NAME, 0.0f)};
     std::vector<std::string> fonts{};
     ModComboString::Ptr m_font_file{};
-    ModComboString::Ptr m_language{ ModComboString::create(generate_name("Language"), { "简体中文", "English" }, "简体中文") };
+    ModComboString::Ptr m_language{ ModComboString::create(generate_name("Language"), { "Auto (System)", "简体中文", "English" }, "Auto (System)") };
 
     ValueList m_options {
         *m_menu_key,
